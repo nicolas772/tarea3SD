@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package starwars;
+
+option go_package = "example.com/go-starwars-grpc;go_starwars_grpc";
+
+service StarWars {
+    rpc AddCity (NewCity) returns (RespBroker1) {}
+}
+
+message NewCity {
+    string nombre_planeta = 1;
+    string nombre_ciudad = 2;
+    string action = 3;
+    optional string nuevo_valor = 4;
+}
+
+message RespBroker1 {
+    string direccion_servidor = 1;
+}
