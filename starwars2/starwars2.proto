@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package starwars2;
+
+option go_package = "example.com/go-starwars-grpc;go_starwars_grpc";
+
+service StarWars1 {
+    rpc CityMgmtFulcrum (NewCity1) returns (RespFulcrum1) {}
+}
+
+message NewCity1 {
+    string nombre_planeta = 1;
+    string nombre_ciudad = 2;
+    string action = 3;
+    optional string nuevo_valor = 4;
+}
+
+message RespFulcrum1 {
+    int32 reloj_vector1 = 1;
+    int32 reloj_vector2 = 2;
+    int32 reloj_vector3 = 3;
+}

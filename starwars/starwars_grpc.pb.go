@@ -18,7 +18,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type StarWarsClient interface {
-	AddCity(ctx context.Context, in *NewCity, opts ...grpc.CallOption) (*RespBroker1, error)
+	CityMgmtBroker(ctx context.Context, in *NewCity, opts ...grpc.CallOption) (*RespBroker1, error)
 }
 
 type starWarsClient struct {
@@ -29,9 +29,9 @@ func NewStarWarsClient(cc grpc.ClientConnInterface) StarWarsClient {
 	return &starWarsClient{cc}
 }
 
-func (c *starWarsClient) AddCity(ctx context.Context, in *NewCity, opts ...grpc.CallOption) (*RespBroker1, error) {
+func (c *starWarsClient) CityMgmtBroker(ctx context.Context, in *NewCity, opts ...grpc.CallOption) (*RespBroker1, error) {
 	out := new(RespBroker1)
-	err := c.cc.Invoke(ctx, "/starwars.StarWars/AddCity", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/starwars.StarWars/CityMgmtBroker", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func (c *starWarsClient) AddCity(ctx context.Context, in *NewCity, opts ...grpc.
 // All implementations must embed UnimplementedStarWarsServer
 // for forward compatibility
 type StarWarsServer interface {
-	AddCity(context.Context, *NewCity) (*RespBroker1, error)
+	CityMgmtBroker(context.Context, *NewCity) (*RespBroker1, error)
 	mustEmbedUnimplementedStarWarsServer()
 }
 
@@ -50,8 +50,8 @@ type StarWarsServer interface {
 type UnimplementedStarWarsServer struct {
 }
 
-func (UnimplementedStarWarsServer) AddCity(context.Context, *NewCity) (*RespBroker1, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddCity not implemented")
+func (UnimplementedStarWarsServer) CityMgmtBroker(context.Context, *NewCity) (*RespBroker1, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CityMgmtBroker not implemented")
 }
 func (UnimplementedStarWarsServer) mustEmbedUnimplementedStarWarsServer() {}
 
@@ -66,20 +66,20 @@ func RegisterStarWarsServer(s grpc.ServiceRegistrar, srv StarWarsServer) {
 	s.RegisterService(&StarWars_ServiceDesc, srv)
 }
 
-func _StarWars_AddCity_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _StarWars_CityMgmtBroker_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(NewCity)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(StarWarsServer).AddCity(ctx, in)
+		return srv.(StarWarsServer).CityMgmtBroker(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/starwars.StarWars/AddCity",
+		FullMethod: "/starwars.StarWars/CityMgmtBroker",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StarWarsServer).AddCity(ctx, req.(*NewCity))
+		return srv.(StarWarsServer).CityMgmtBroker(ctx, req.(*NewCity))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -92,8 +92,8 @@ var StarWars_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*StarWarsServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "AddCity",
-			Handler:    _StarWars_AddCity_Handler,
+			MethodName: "CityMgmtBroker",
+			Handler:    _StarWars_CityMgmtBroker_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

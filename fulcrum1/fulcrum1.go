@@ -5,25 +5,25 @@ import (
 	"log"
 	"net"
 
-	pb "example.com/go-starwars-grpc/starwars"
+	pb "example.com/go-starwars-grpc/starwars2"
 	"google.golang.org/grpc"
 )
 
 const (
-	port = ":50051"
+	port = ":50052"
 )
 
-type BrokerServer struct {
-	pb.UnimplementedStarWarsServer
+type FulcrumServer struct {
+	pb.UnimplementedStarWars1Server
 }
 
-func (s *BrokerServer) CityMgmtBroker(ctx context.Context, in *pb.NewCity) (*pb.RespBroker1, error) {
+func (s *FulcrumServer) CityMgmtFulcrum(ctx context.Context, in *pb.NewCity1) (*pb.RespFulcrum1, error) {
 	log.Printf("Received: %v", in.GetNombrePlaneta())
 	log.Printf("Received: %v", in.GetNombreCiudad())
 	log.Printf("Received: %v", in.GetNuevoValor())
 	log.Printf("Received: %v", in.GetAction())
-	var direccion string = "localhost:50052"
-	return &pb.RespBroker1{DireccionServidor: direccion}, nil
+	reloj_vector := [3]int{1, 2, 3}
+	return &pb.RespFulcrum1{RelojVector1: int32(reloj_vector[0]), RelojVector2: int32(reloj_vector[1]), RelojVector3: int32(reloj_vector[2])}, nil
 }
 
 func main() {
@@ -33,7 +33,7 @@ func main() {
 	}
 
 	s := grpc.NewServer()
-	pb.RegisterStarWarsServer(s, &BrokerServer{})
+	pb.RegisterStarWars1Server(s, &FulcrumServer{})
 	log.Printf("server listening at %v", lis.Addr())
 
 	if err := s.Serve(lis); err != nil {

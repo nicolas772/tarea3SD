@@ -5,7 +5,7 @@ package starwars;
 option go_package = "example.com/go-starwars-grpc;go_starwars_grpc";
 
 service StarWars {
-    rpc AddCity (NewCity) returns (RespBroker1) {}
+    rpc CityMgmtBroker (NewCity) returns (RespBroker1) {}
 }
 
 message NewCity {
