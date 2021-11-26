@@ -79,14 +79,30 @@ func main() {
 				planeta := split[1]
 				ciudad := split[2]
 				action := split[0]
-				nuevo_valor := split[3]
+				cant_soldados := split[3]
 				ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 				defer cancel()
-				r, err := c.CityMgmtBroker(ctx, &pb.NewCity{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action, NuevoValor: &nuevo_valor})
+				r, err := c.CityMgmtBroker(ctx, &pb.NewCity{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action, NuevoValor: &cant_soldados})
 				if err != nil {
 					log.Fatalf("could not create city: %v", err)
 				}
-				fmt.Println("Servidor Fulcrum asignado: ", r.GetDireccionServidor())
+				servidor_asignado := r.GetDireccionServidor()
+				fmt.Println("Servidor Fulcrum asignado:", servidor_asignado)
+				conn1, err1 := grpc.Dial(servidor_asignado, grpc.WithInsecure(), grpc.WithBlock())
+				if err1 != nil {
+					log.Fatalf("did not connect: %v", err)
+				}
+				//defer conn1.Close()
+				c1 := pb1.NewStarWars1Client(conn1)
+				ctx1, cancel := context.WithTimeout(context.Background(), time.Second)
+				defer cancel()
+				r1, errr := c1.CityMgmtFulcrum(ctx1, &pb1.NewCity1{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action, NuevoValor: &cant_soldados})
+				if errr != nil {
+					log.Fatalf("could not create city in fulcrum: %v", errr)
+				}
+				reloj_vector := [3]int{int(r1.GetRelojVector1()), int(r1.GetRelojVector2()), int(r1.GetRelojVector3())}
+				fmt.Println("Reloj vector: ", reloj_vector)
+				conn1.Close()
 
 			} else if split[0] == "DeleteCity" && len(split) == 3 { //Comando "DeleteCity"
 				planeta := split[1]
@@ -98,7 +114,23 @@ func main() {
 				if err != nil {
 					log.Fatalf("could not create city: %v", err)
 				}
-				fmt.Println("Servidor Fulcrum asignado: ", r.GetDireccionServidor())
+				servidor_asignado := r.GetDireccionServidor()
+				fmt.Println("Servidor Fulcrum asignado:", servidor_asignado)
+				conn1, err1 := grpc.Dial(servidor_asignado, grpc.WithInsecure(), grpc.WithBlock())
+				if err1 != nil {
+					log.Fatalf("did not connect: %v", err)
+				}
+				//defer conn1.Close()
+				c1 := pb1.NewStarWars1Client(conn1)
+				ctx1, cancel := context.WithTimeout(context.Background(), time.Second)
+				defer cancel()
+				r1, errr := c1.CityMgmtFulcrum(ctx1, &pb1.NewCity1{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action})
+				if errr != nil {
+					log.Fatalf("could not create city in fulcrum: %v", errr)
+				}
+				reloj_vector := [3]int{int(r1.GetRelojVector1()), int(r1.GetRelojVector2()), int(r1.GetRelojVector3())}
+				fmt.Println("Reloj vector: ", reloj_vector)
+				conn1.Close()
 
 			} else {
 				fmt.Println("Comando Invalido")
