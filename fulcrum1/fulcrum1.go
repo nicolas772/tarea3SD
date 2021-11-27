@@ -16,6 +16,7 @@ import (
 const (
 	port                     = ":50052"
 	path_registro_planetario = "./fulcrum1/registrosPlanetarios/"
+	path_log_registro        = "./fulcrum1/logRegistros/"
 )
 
 type FulcrumServer struct {
@@ -108,13 +109,16 @@ func (s *FulcrumServer) CityMgmtFulcrum(ctx context.Context, in *pb.NewCity1) (*
 	ciudad := in.GetNombreCiudad()
 	valor := in.GetNuevoValor()
 	reloj_vector := [3]int{1, 2, 3}
-	ruta := path_registro_planetario + planeta + ".txt"
+	ruta1 := path_log_registro + planeta + ".txt"
+	crearArchivo(ruta1)
+	escribeArchivo(accion+" "+planeta+" "+ciudad+" "+valor, ruta1)
+	ruta2 := path_registro_planetario + planeta + ".txt"
 	if accion == "AddCity" {
 		linea_archivo := planeta + " " + ciudad + " " + valor
-		crearArchivo(ruta)
-		escribeArchivo(linea_archivo, ruta)
+		crearArchivo(ruta2)
+		escribeArchivo(linea_archivo, ruta2)
 	} else {
-		editarArchivo(ruta, ciudad, valor, accion)
+		editarArchivo(ruta2, ciudad, valor, accion)
 	}
 
 	return &pb.RespFulcrum1{RelojVector1: int32(reloj_vector[0]), RelojVector2: int32(reloj_vector[1]), RelojVector3: int32(reloj_vector[2])}, nil
