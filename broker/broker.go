@@ -25,9 +25,9 @@ func (s *BrokerServer) CityMgmtBroker(ctx context.Context, in *pb.NewCity) (*pb.
 	log.Printf("Received: %v", in.GetNuevoValor())
 	log.Printf("Received: %v", in.GetAction())
 	rand.Seed(int64(time.Now().UnixNano()))
-	direcciones := [3]string{"localhost:50052", "localhost:50053", "localhost:50054"}
-
-	var direccion string = direcciones[rand.Intn(3)]
+	//direcciones_fulcrum := [3]string{"localhost:50052", "localhost:50053", "localhost:50054"}
+	//direccion := direcciones_fulcrum[rand.Intn(3)]
+	direccion := "localhost:50052"
 	return &pb.RespBroker1{DireccionServidor: direccion}, nil
 }
 
