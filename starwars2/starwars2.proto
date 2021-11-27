@@ -19,4 +19,9 @@ message RespFulcrum1 {
     int32 reloj_vector1 = 1;
     int32 reloj_vector2 = 2;
     int32 reloj_vector3 = 3;
+    string planeta = 4;
+}
+
+message VectoresList {
+    repeated RespFulcrum1 vectores = 1; 
 }

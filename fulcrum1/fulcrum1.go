@@ -19,8 +19,27 @@ const (
 	path_log_registro        = "./fulcrum1/logRegistros/"
 )
 
+func NewFulcrumServer() *FulcrumServer {
+	return &FulcrumServer{
+		vectores_list: &pb.VectoresList{},
+	}
+}
+
 type FulcrumServer struct {
 	pb.UnimplementedStarWars1Server
+	vectores_list *pb.VectoresList
+}
+
+func (server *FulcrumServer) Run() error {
+	lis, err := net.Listen("tcp", port)
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+
+	s := grpc.NewServer()
+	pb.RegisterStarWars1Server(s, server)
+	log.Printf("server listening at %v", lis.Addr())
+	return s.Serve(lis)
 }
 
 func crearArchivo(path string) {
@@ -108,7 +127,24 @@ func (s *FulcrumServer) CityMgmtFulcrum(ctx context.Context, in *pb.NewCity1) (*
 	planeta := in.GetNombrePlaneta()
 	ciudad := in.GetNombreCiudad()
 	valor := in.GetNuevoValor()
-	reloj_vector := [3]int{1, 2, 3}
+
+	//manejo de vector_reloj
+	no_vector_creado := true
+	vector_retorno := &pb.RespFulcrum1{}
+	for _, vect := range s.vectores_list.Vectores {
+		if vect.Planeta == planeta {
+			vect.RelojVector1++ //aumento en 1 la cantidad de cambios
+			no_vector_creado = false
+			vector_retorno = vect
+		}
+	}
+	if no_vector_creado {
+		created_vector := &pb.RespFulcrum1{RelojVector1: 1, RelojVector2: 0, RelojVector3: 0, Planeta: planeta}
+		s.vectores_list.Vectores = append(s.vectores_list.Vectores, created_vector)
+		vector_retorno = created_vector
+	}
+
+	//Manejo de archivos logRegistro y RegistroPlanetario
 	ruta1 := path_log_registro + planeta + ".txt"
 	crearArchivo(ruta1)
 	escribeArchivo(accion+" "+planeta+" "+ciudad+" "+valor, ruta1)
@@ -120,21 +156,12 @@ func (s *FulcrumServer) CityMgmtFulcrum(ctx context.Context, in *pb.NewCity1) (*
 	} else {
 		editarArchivo(ruta2, ciudad, valor, accion)
 	}
-
-	return &pb.RespFulcrum1{RelojVector1: int32(reloj_vector[0]), RelojVector2: int32(reloj_vector[1]), RelojVector3: int32(reloj_vector[2])}, nil
+	return vector_retorno, nil
 }
 
 func main() {
-	lis, err := net.Listen("tcp", port)
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
-
-	s := grpc.NewServer()
-	pb.RegisterStarWars1Server(s, &FulcrumServer{})
-	log.Printf("server listening at %v", lis.Addr())
-
-	if err := s.Serve(lis); err != nil {
+	var fulcrum_server *FulcrumServer = NewFulcrumServer()
+	if err := fulcrum_server.Run(); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
 

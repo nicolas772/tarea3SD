@@ -1,4 +1,0 @@
-AddCity chile santiago 39
-AddCity chile temuco 23
-AddCity chile chillan 4
-DeleteCity chile santiago 
