@@ -33,3 +33,14 @@ message RegistroModificado {
 message RegistrosModificadosList {
     repeated RegistroModificado registros = 1;
 }
+
+message CiudadSolicitada {
+    string ciudad = 1;
+    string planeta = 2;
+    repeated int32 reloj_vector = 3;
+    string ultimo_servidor_fulcrum = 4;
+}
+
+message CiudadesSolicitadasList {
+    repeated CiudadSolicitada ciudades = 1;
+}

@@ -19,6 +19,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type StarWarsClient interface {
 	CityMgmtBroker(ctx context.Context, in *NewCity, opts ...grpc.CallOption) (*RespBroker1, error)
+	CityLeiaBroker(ctx context.Context, in *NewCity, opts ...grpc.CallOption) (*RespBroker2, error)
 }
 
 type starWarsClient struct {
@@ -38,11 +39,21 @@ func (c *starWarsClient) CityMgmtBroker(ctx context.Context, in *NewCity, opts .
 	return out, nil
 }
 
+func (c *starWarsClient) CityLeiaBroker(ctx context.Context, in *NewCity, opts ...grpc.CallOption) (*RespBroker2, error) {
+	out := new(RespBroker2)
+	err := c.cc.Invoke(ctx, "/starwars.StarWars/CityLeiaBroker", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // StarWarsServer is the server API for StarWars service.
 // All implementations must embed UnimplementedStarWarsServer
 // for forward compatibility
 type StarWarsServer interface {
 	CityMgmtBroker(context.Context, *NewCity) (*RespBroker1, error)
+	CityLeiaBroker(context.Context, *NewCity) (*RespBroker2, error)
 	mustEmbedUnimplementedStarWarsServer()
 }
 
@@ -52,6 +63,9 @@ type UnimplementedStarWarsServer struct {
 
 func (UnimplementedStarWarsServer) CityMgmtBroker(context.Context, *NewCity) (*RespBroker1, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CityMgmtBroker not implemented")
+}
+func (UnimplementedStarWarsServer) CityLeiaBroker(context.Context, *NewCity) (*RespBroker2, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CityLeiaBroker not implemented")
 }
 func (UnimplementedStarWarsServer) mustEmbedUnimplementedStarWarsServer() {}
 
@@ -84,6 +98,24 @@ func _StarWars_CityMgmtBroker_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _StarWars_CityLeiaBroker_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NewCity)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StarWarsServer).CityLeiaBroker(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/starwars.StarWars/CityLeiaBroker",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StarWarsServer).CityLeiaBroker(ctx, req.(*NewCity))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // StarWars_ServiceDesc is the grpc.ServiceDesc for StarWars service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -94,6 +126,10 @@ var StarWars_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CityMgmtBroker",
 			Handler:    _StarWars_CityMgmtBroker_Handler,
+		},
+		{
+			MethodName: "CityLeiaBroker",
+			Handler:    _StarWars_CityLeiaBroker_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
