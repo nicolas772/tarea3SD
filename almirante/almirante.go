@@ -18,18 +18,42 @@ const (
 	address = "localhost:50051"
 )
 
+func NewAlmiranteServer() *AlmiranteServer {
+	return &AlmiranteServer{
+		registros_modificados_list: &pb1.RegistrosModificadosList{},
+	}
+}
+
+type AlmiranteServer struct {
+	registros_modificados_list *pb1.RegistrosModificadosList
+}
+
+func ActualizarListaRegistro(planet string, server string, a *AlmiranteServer, rv []int32) {
+	no_registro_creado := true
+	for _, vect := range a.registros_modificados_list.Registros {
+		if vect.Planeta == planet {
+			vect.RelojVector = rv
+			vect.UltimoServidorFulcrum = server
+			no_registro_creado = false
+		}
+	}
+	if no_registro_creado {
+		new_registro := &pb1.RegistroModificado{Planeta: planet, RelojVector: rv, UltimoServidorFulcrum: server}
+		a.registros_modificados_list.Registros = append(a.registros_modificados_list.Registros, new_registro)
+	}
+}
+
 func main() {
 	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
-
 	defer conn.Close()
 	c := pb.NewStarWarsClient(conn)
-
-	flag := true
+	no_quit := true
+	var almirante_server *AlmiranteServer = NewAlmiranteServer()
 	fmt.Println("Bienvenido Almirante Thrawn")
-	for flag {
+	for no_quit {
 		fmt.Println("Por favor, ingrese el comando. Para salir, presione 'Q'")
 		reader := bufio.NewReader(os.Stdin)
 		entrada, _ := reader.ReadString('\n')         // Leer hasta el separador de salto de línea
@@ -37,7 +61,7 @@ func main() {
 
 		if comando == "q" || comando == "Q" {
 			fmt.Println("Hasta pronto Almirante Thrawn")
-			flag = false
+			no_quit = false
 		} else {
 			split := strings.Split(comando, " ")
 
@@ -71,8 +95,9 @@ func main() {
 				if errr != nil {
 					log.Fatalf("could not create city in fulcrum: %v", errr)
 				}
-				reloj_vector := [3]int{int(r1.GetRelojVector1()), int(r1.GetRelojVector2()), int(r1.GetRelojVector3())}
+				reloj_vector := r1.GetRelojVector()
 				fmt.Println("Reloj vector: ", reloj_vector)
+				ActualizarListaRegistro(planeta, servidor_asignado, almirante_server, reloj_vector)
 				conn1.Close()
 
 			} else if (split[0] == "UpdateName" || split[0] == "UpdateNumber") && len(split) == 4 { //Comando "UpdateName" y "UpdateNumber"
@@ -100,8 +125,9 @@ func main() {
 				if errr != nil {
 					log.Fatalf("could not create city in fulcrum: %v", errr)
 				}
-				reloj_vector := [3]int{int(r1.GetRelojVector1()), int(r1.GetRelojVector2()), int(r1.GetRelojVector3())}
+				reloj_vector := r1.GetRelojVector()
 				fmt.Println("Reloj vector: ", reloj_vector)
+				ActualizarListaRegistro(planeta, servidor_asignado, almirante_server, reloj_vector)
 				conn1.Close()
 
 			} else if split[0] == "DeleteCity" && len(split) == 3 { //Comando "DeleteCity"
@@ -128,8 +154,9 @@ func main() {
 				if errr != nil {
 					log.Fatalf("could not create city in fulcrum: %v", errr)
 				}
-				reloj_vector := [3]int{int(r1.GetRelojVector1()), int(r1.GetRelojVector2()), int(r1.GetRelojVector3())}
+				reloj_vector := r1.GetRelojVector()
 				fmt.Println("Reloj vector: ", reloj_vector)
+				ActualizarListaRegistro(planeta, servidor_asignado, almirante_server, reloj_vector)
 				conn1.Close()
 
 			} else {

@@ -16,12 +16,20 @@ message NewCity1 {
 }
 
 message RespFulcrum1 {
-    int32 reloj_vector1 = 1;
-    int32 reloj_vector2 = 2;
-    int32 reloj_vector3 = 3;
-    string planeta = 4;
+    repeated int32 reloj_vector = 1;
+    string planeta = 2;
 }
 
 message VectoresList {
     repeated RespFulcrum1 vectores = 1; 
+}
+
+message RegistroModificado {
+    string planeta = 1;
+    repeated int32 reloj_vector = 2;
+    string ultimo_servidor_fulcrum = 3;
+}
+
+message RegistrosModificadosList {
+    repeated RegistroModificado registros = 1;
 }
