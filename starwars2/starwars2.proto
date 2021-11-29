@@ -6,6 +6,7 @@ option go_package = "example.com/go-starwars-grpc;go_starwars_grpc";
 
 service StarWars1 {
     rpc CityMgmtFulcrum (NewCity1) returns (RespFulcrum1) {}
+    rpc CityBrokerFulcrum (NewCity1) returns (RespFulcrum2) {}
 }
 
 message NewCity1 {
@@ -43,4 +44,9 @@ message CiudadSolicitada {
 
 message CiudadesSolicitadasList {
     repeated CiudadSolicitada ciudades = 1;
+}
+message RespFulcrum2 {
+    int32 cant_rebeldes = 1;
+    repeated int32 reloj_vector = 2;
+    string servidor_contactado = 3;
 }

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	pb "example.com/go-starwars-grpc/starwars"
+	pb1 "example.com/go-starwars-grpc/starwars2"
 	"google.golang.org/grpc"
 )
 
@@ -29,47 +30,63 @@ func (s *BrokerServer) CityMgmtBroker(ctx context.Context, in *pb.NewCity) (*pb.
 	rand.Seed(int64(time.Now().UnixNano()))
 	//direcciones_fulcrum := [3]string{"localhost:50052", "localhost:50053", "localhost:50054"}
 	//direccion := direcciones_fulcrum[rand.Intn(3)]
-	direccion := "localhost:50052"
+	direccion := "localhost:50052" //este debe ser aleatorio
 	return &pb.RespBroker1{DireccionServidor: direccion}, nil
 }
 func (s *BrokerServer) CityLeiaBroker(ctx context.Context, in *pb.NewCity) (*pb.RespBroker2, error) {
 	log.Printf("Received from Leia: %v", in.GetNombrePlaneta())
 	log.Printf("Received from Leia: %v", in.GetNombreCiudad())
 	log.Printf("Received from Leia: %v", in.GetAction())
-	cant_rebeldes := 99
-	reloj_vector := []int32{1, 0, 0}
-	servidor_contactado := "localhost:50052"
+	planeta := in.GetNombrePlaneta()
+	ciudad := in.GetNombreCiudad()
+	action := in.GetAction()
+	servidor_contactado := "localhost:50052" //este debe ser aleatorio
+	//direcciones_fulcrum := [3]string{"localhost:50052", "localhost:50053", "localhost:50054"}
+	//direccion := direcciones_fulcrum[rand.Intn(3)]
+
+	conn, err := grpc.Dial(servidor_contactado, grpc.WithInsecure(), grpc.WithBlock())
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	defer conn.Close()
+	c := pb1.NewStarWars1Client(conn)
+	ctx1, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	r, err := c.CityBrokerFulcrum(ctx1, &pb1.NewCity1{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action})
+	if err != nil {
+		log.Fatalln(err)
+	}
+	cant_rebeldes := r.GetCantRebeldes()
+	reloj_vector := r.GetRelojVector()
 	return &pb.RespBroker2{CantRebeldes: int32(cant_rebeldes), RelojVector: reloj_vector, ServidorContactado: servidor_contactado}, nil
 }
 
 func main() {
 	//Conexion con almirante
-	lis, err := net.Listen("tcp", port_almirante)
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
-	s := grpc.NewServer()
-	pb.RegisterStarWarsServer(s, &BrokerServer{})
-	log.Printf("server listening at %v", lis.Addr())
-	//conexion con Leia
-	lis1, err1 := net.Listen("tcp", port_leia)
-	if err1 != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
-
-	s1 := grpc.NewServer()
-	pb.RegisterStarWarsServer(s1, &BrokerServer{})
-	log.Printf("server listening at %v", lis1.Addr())
-
 	go func() {
+		lis, err := net.Listen("tcp", port_almirante)
+		if err != nil {
+			log.Fatalf("failed to listen: %v", err)
+		}
+		s := grpc.NewServer()
+		pb.RegisterStarWarsServer(s, &BrokerServer{})
+		log.Printf("server listening at %v", lis.Addr())
 		if err := s.Serve(lis); err != nil {
 			log.Fatalf("failed to serve: %v", err)
 		}
 
 	}()
-
+	//Conexion con Leia
 	go func() {
-		if err := s.Serve(lis1); err != nil {
+		lis1, err1 := net.Listen("tcp", port_leia)
+		if err1 != nil {
+			log.Fatalf("failed to listen: %v", err1)
+		}
+
+		s1 := grpc.NewServer()
+		pb.RegisterStarWarsServer(s1, &BrokerServer{})
+		log.Printf("server listening at %v", lis1.Addr())
+		if err := s1.Serve(lis1); err != nil {
 			log.Fatalf("failed to serve: %v", err)
 		}
 	}()

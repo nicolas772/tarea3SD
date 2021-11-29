@@ -69,11 +69,6 @@ func main() {
 				planeta := split[1]
 				ciudad := split[2]
 				action := split[0]
-				/*cant_soldados := "0"
-				if len(split) == 4 {
-					cant_soldados = split[3]
-				}*/
-
 				ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 				defer cancel()
 				r, err := c.CityLeiaBroker(ctx, &pb.NewCity{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action})
@@ -87,6 +82,7 @@ func main() {
 				fmt.Println("reloj vector:", reloj)
 				fmt.Println("servidor contactado:", servidor_consultado)
 				ActualizarListaCiudades(ciudad, planeta, servidor_consultado, leia_server, reloj)
+				fmt.Println("Lista Ciudades:", leia_server.ciudades_solic_list)
 
 			} else {
 				fmt.Println("Comando Invalido")

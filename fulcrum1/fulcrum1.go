@@ -7,6 +7,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"strconv"
 	"strings"
 
 	pb "example.com/go-starwars-grpc/starwars2"
@@ -14,7 +15,8 @@ import (
 )
 
 const (
-	port                     = ":50052"
+	port_almirante           = ":50052"
+	port_broker              = ":50053"
 	path_registro_planetario = "./fulcrum1/registrosPlanetarios/"
 	path_log_registro        = "./fulcrum1/logRegistros/"
 )
@@ -30,7 +32,7 @@ type FulcrumServer struct {
 	vectores_list *pb.VectoresList
 }
 
-func (server *FulcrumServer) Run() error {
+func (server *FulcrumServer) Run(port string) error {
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
@@ -118,11 +120,48 @@ func editarArchivo(path string, ciudad string, valor_nuevo string, modo string) 
 	}
 }
 
+func BuscarCantidadRebeldes(planeta string, ciudad string) int {
+	cant_rebeldes := 0
+	path := path_registro_planetario + planeta + ".txt"
+	input, err := ioutil.ReadFile(path)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	lines := strings.Split(string(input), "\n")
+	for _, line := range lines {
+		if line != "" {
+			split_line := strings.Split(line, " ")
+			if split_line[1] == ciudad {
+				cant_rebeldes, err = strconv.Atoi(split_line[2])
+				if err != nil {
+					log.Fatalln(err)
+				}
+			}
+		}
+	}
+	output := strings.Join(lines, "\n")
+	err = ioutil.WriteFile(path, []byte(output), 0644)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return cant_rebeldes
+}
+
+func BuscarRelojVector(planeta string, s *FulcrumServer) []int32 {
+	vector_retorno := []int32{0, 0, 0}
+	for _, vect := range s.vectores_list.Vectores {
+		if vect.Planeta == planeta {
+			vector_retorno = vect.RelojVector
+		}
+	}
+	return vector_retorno
+}
+
 func (s *FulcrumServer) CityMgmtFulcrum(ctx context.Context, in *pb.NewCity1) (*pb.RespFulcrum1, error) {
-	log.Printf("Received: %v", in.GetNombrePlaneta())
-	log.Printf("Received: %v", in.GetNombreCiudad())
-	log.Printf("Received: %v", in.GetNuevoValor())
-	log.Printf("Received: %v", in.GetAction())
+	log.Printf("Received from Informante: %v", in.GetNombrePlaneta())
+	log.Printf("Received from Informante: %v", in.GetNombreCiudad())
+	log.Printf("Received from Informante: %v", in.GetNuevoValor())
+	log.Printf("Received from Informante: %v", in.GetAction())
 	accion := in.GetAction()
 	planeta := in.GetNombrePlaneta()
 	ciudad := in.GetNombreCiudad()
@@ -159,10 +198,35 @@ func (s *FulcrumServer) CityMgmtFulcrum(ctx context.Context, in *pb.NewCity1) (*
 	return vector_retorno, nil
 }
 
+func (s *FulcrumServer) CityBrokerFulcrum(ctx context.Context, in *pb.NewCity1) (*pb.RespFulcrum2, error) {
+	log.Printf("Received from Broker: %v", in.GetNombrePlaneta())
+	log.Printf("Received from Broker: %v", in.GetNombreCiudad())
+	log.Printf("Received from Broker: %v", in.GetAction())
+	planeta := in.GetNombrePlaneta()
+	ciudad := in.GetNombreCiudad()
+	cant_rebeldes := BuscarCantidadRebeldes(planeta, ciudad)
+	reloj_vector := BuscarRelojVector(planeta, s)
+	return &pb.RespFulcrum2{CantRebeldes: int32(cant_rebeldes), RelojVector: reloj_vector, ServidorContactado: "Fulcrum1"}, nil
+}
+
 func main() {
-	var fulcrum_server *FulcrumServer = NewFulcrumServer()
-	if err := fulcrum_server.Run(); err != nil {
-		log.Fatalf("failed to serve: %v", err)
-	}
+	//conexion con Almirante
+	go func() {
+		var fulcrum_server *FulcrumServer = NewFulcrumServer()
+		if err := fulcrum_server.Run(port_almirante); err != nil {
+			log.Fatalf("failed to serve: %v", err)
+		}
+	}()
+	go func() {
+		var fulcrum_server *FulcrumServer = NewFulcrumServer()
+		if err := fulcrum_server.Run(port_broker); err != nil {
+			log.Fatalf("failed to serve: %v", err)
+		}
+	}()
+
+	fmt.Println("Para salir del servidor, presione Q y luego Enter")
+	var sa string
+	fmt.Scan(&sa)
+	fmt.Println("Servidor Fulcrum 1 finalizado")
 
 }
