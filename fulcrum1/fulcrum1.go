@@ -17,6 +17,7 @@ import (
 const (
 	port_almirante           = ":50052"
 	port_broker              = ":50053"
+	port_ahsoka              = ":50055"
 	path_registro_planetario = "./fulcrum1/registrosPlanetarios/"
 	path_log_registro        = "./fulcrum1/logRegistros/"
 )
@@ -158,10 +159,10 @@ func BuscarRelojVector(planeta string, s *FulcrumServer) []int32 {
 }
 
 func (s *FulcrumServer) CityMgmtFulcrum(ctx context.Context, in *pb.NewCity1) (*pb.RespFulcrum1, error) {
-	log.Printf("Received from Informante: %v", in.GetNombrePlaneta())
-	log.Printf("Received from Informante: %v", in.GetNombreCiudad())
-	log.Printf("Received from Informante: %v", in.GetNuevoValor())
-	log.Printf("Received from Informante: %v", in.GetAction())
+	log.Printf("Received from %v: %v", in.GetSender(), in.GetNombrePlaneta())
+	log.Printf("Received from %v: %v", in.GetSender(), in.GetNombreCiudad())
+	log.Printf("Received from %v: %v", in.GetSender(), in.GetNuevoValor())
+	log.Printf("Received from %v: %v", in.GetSender(), in.GetAction())
 	accion := in.GetAction()
 	planeta := in.GetNombrePlaneta()
 	ciudad := in.GetNombreCiudad()
@@ -195,6 +196,7 @@ func (s *FulcrumServer) CityMgmtFulcrum(ctx context.Context, in *pb.NewCity1) (*
 	} else {
 		editarArchivo(ruta2, ciudad, valor, accion)
 	}
+	fmt.Println("vectores list:", s.vectores_list)
 	return vector_retorno, nil
 }
 
@@ -210,16 +212,22 @@ func (s *FulcrumServer) CityBrokerFulcrum(ctx context.Context, in *pb.NewCity1) 
 }
 
 func main() {
+	var fulcrum_server *FulcrumServer = NewFulcrumServer()
 	//conexion con Almirante
 	go func() {
-		var fulcrum_server *FulcrumServer = NewFulcrumServer()
 		if err := fulcrum_server.Run(port_almirante); err != nil {
 			log.Fatalf("failed to serve: %v", err)
 		}
 	}()
+	//Conexion con broker
 	go func() {
-		var fulcrum_server *FulcrumServer = NewFulcrumServer()
 		if err := fulcrum_server.Run(port_broker); err != nil {
+			log.Fatalf("failed to serve: %v", err)
+		}
+	}()
+	//conexion con ahsoka
+	go func() {
+		if err := fulcrum_server.Run(port_ahsoka); err != nil {
 			log.Fatalf("failed to serve: %v", err)
 		}
 	}()

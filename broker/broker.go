@@ -16,6 +16,7 @@ import (
 const (
 	port_almirante = ":50051"
 	port_leia      = ":50050"
+	port_ahsoka    = ":50054"
 )
 
 type BrokerServer struct {
@@ -23,14 +24,20 @@ type BrokerServer struct {
 }
 
 func (s *BrokerServer) CityMgmtBroker(ctx context.Context, in *pb.NewCity) (*pb.RespBroker1, error) {
-	log.Printf("Received: %v", in.GetNombrePlaneta())
-	log.Printf("Received: %v", in.GetNombreCiudad())
-	log.Printf("Received: %v", in.GetNuevoValor())
-	log.Printf("Received: %v", in.GetAction())
+	log.Printf("Received from %v: %v", in.GetSender(), in.GetNombrePlaneta())
+	log.Printf("Received from %v: %v", in.GetSender(), in.GetNombreCiudad())
+	log.Printf("Received from %v: %v", in.GetSender(), in.GetNuevoValor())
+	log.Printf("Received from %v: %v", in.GetSender(), in.GetAction())
 	rand.Seed(int64(time.Now().UnixNano()))
 	//direcciones_fulcrum := [3]string{"localhost:50052", "localhost:50053", "localhost:50054"}
 	//direccion := direcciones_fulcrum[rand.Intn(3)]
-	direccion := "localhost:50052" //este debe ser aleatorio
+	var direccion string
+	if in.GetSender() == "almirante" {
+		direccion = "localhost:50052" //este debe ser aleatorio
+	} else {
+		direccion = "localhost:50055"
+	}
+	//este debe ser aleatorio
 	return &pb.RespBroker1{DireccionServidor: direccion}, nil
 }
 func (s *BrokerServer) CityLeiaBroker(ctx context.Context, in *pb.NewCity) (*pb.RespBroker2, error) {
@@ -87,6 +94,20 @@ func main() {
 		pb.RegisterStarWarsServer(s1, &BrokerServer{})
 		log.Printf("server listening at %v", lis1.Addr())
 		if err := s1.Serve(lis1); err != nil {
+			log.Fatalf("failed to serve: %v", err)
+		}
+	}()
+	//conexion con ahsoka
+	go func() {
+		lis2, err2 := net.Listen("tcp", port_ahsoka)
+		if err2 != nil {
+			log.Fatalf("failed to listen: %v", err2)
+		}
+
+		s2 := grpc.NewServer()
+		pb.RegisterStarWarsServer(s2, &BrokerServer{})
+		log.Printf("server listening at %v", lis2.Addr())
+		if err := s2.Serve(lis2); err != nil {
 			log.Fatalf("failed to serve: %v", err)
 		}
 	}()

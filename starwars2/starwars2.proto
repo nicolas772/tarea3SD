@@ -14,6 +14,7 @@ message NewCity1 {
     string nombre_ciudad = 2;
     string action = 3;
     optional string nuevo_valor = 4;
+    string sender = 5;
 }
 
 message RespFulcrum1 {

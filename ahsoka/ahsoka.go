@@ -15,20 +15,20 @@ import (
 )
 
 const (
-	address = "localhost:50051"
+	address = "localhost:50054"
 )
 
-func NewAlmiranteServer() *AlmiranteServer {
-	return &AlmiranteServer{
+func NewAhsokaServer() *AhsokaServer {
+	return &AhsokaServer{
 		registros_modificados_list: &pb1.RegistrosModificadosList{},
 	}
 }
 
-type AlmiranteServer struct {
+type AhsokaServer struct {
 	registros_modificados_list *pb1.RegistrosModificadosList
 }
 
-func ActualizarListaRegistro(planet string, server string, a *AlmiranteServer, rv []int32) {
+func ActualizarListaRegistro(planet string, server string, a *AhsokaServer, rv []int32) {
 	no_registro_creado := true
 	for _, vect := range a.registros_modificados_list.Registros {
 		if vect.Planeta == planet {
@@ -51,8 +51,8 @@ func main() {
 	defer conn.Close()
 	c := pb.NewStarWarsClient(conn)
 	no_quit := true
-	var almirante_server *AlmiranteServer = NewAlmiranteServer()
-	fmt.Println("Bienvenido Almirante Thrawn")
+	var almirante_server *AhsokaServer = NewAhsokaServer()
+	fmt.Println("Bienvenida Ahsoka Tano")
 	for no_quit {
 		fmt.Println("Por favor, ingrese el comando. Para salir, presione 'Q'")
 		reader := bufio.NewReader(os.Stdin)
@@ -76,7 +76,7 @@ func main() {
 
 				ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 				defer cancel()
-				r, err := c.CityMgmtBroker(ctx, &pb.NewCity{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action, NuevoValor: &cant_soldados, Sender: "almirante"})
+				r, err := c.CityMgmtBroker(ctx, &pb.NewCity{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action, NuevoValor: &cant_soldados, Sender: "ahsoka"})
 				if err != nil {
 					log.Fatalf("could not create city in broker: %v", err)
 				}
@@ -91,7 +91,7 @@ func main() {
 				c1 := pb1.NewStarWars1Client(conn1)
 				ctx1, cancel := context.WithTimeout(context.Background(), time.Second)
 				defer cancel()
-				r1, errr := c1.CityMgmtFulcrum(ctx1, &pb1.NewCity1{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action, NuevoValor: &cant_soldados, Sender: "almirante"})
+				r1, errr := c1.CityMgmtFulcrum(ctx1, &pb1.NewCity1{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action, NuevoValor: &cant_soldados, Sender: "ahsoka"})
 				if errr != nil {
 					log.Fatalf("could not create city in fulcrum: %v", errr)
 				}
@@ -108,7 +108,7 @@ func main() {
 				cant_soldados := split[3]
 				ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 				defer cancel()
-				r, err := c.CityMgmtBroker(ctx, &pb.NewCity{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action, NuevoValor: &cant_soldados, Sender: "almirante"})
+				r, err := c.CityMgmtBroker(ctx, &pb.NewCity{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action, NuevoValor: &cant_soldados, Sender: "ahsoka"})
 				if err != nil {
 					log.Fatalf("could not create city: %v", err)
 				}
@@ -122,7 +122,7 @@ func main() {
 				c1 := pb1.NewStarWars1Client(conn1)
 				ctx1, cancel := context.WithTimeout(context.Background(), time.Second)
 				defer cancel()
-				r1, errr := c1.CityMgmtFulcrum(ctx1, &pb1.NewCity1{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action, NuevoValor: &cant_soldados, Sender: "almirante"})
+				r1, errr := c1.CityMgmtFulcrum(ctx1, &pb1.NewCity1{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action, NuevoValor: &cant_soldados, Sender: "ahsoka"})
 				if errr != nil {
 					log.Fatalf("could not create city in fulcrum: %v", errr)
 				}
@@ -138,7 +138,7 @@ func main() {
 				action := split[0]
 				ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 				defer cancel()
-				r, err := c.CityMgmtBroker(ctx, &pb.NewCity{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action, Sender: "almirante"})
+				r, err := c.CityMgmtBroker(ctx, &pb.NewCity{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action, Sender: "ahsoka"})
 				if err != nil {
 					log.Fatalf("could not create city: %v", err)
 				}
@@ -152,7 +152,7 @@ func main() {
 				c1 := pb1.NewStarWars1Client(conn1)
 				ctx1, cancel := context.WithTimeout(context.Background(), time.Second)
 				defer cancel()
-				r1, errr := c1.CityMgmtFulcrum(ctx1, &pb1.NewCity1{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action, Sender: "almirante"})
+				r1, errr := c1.CityMgmtFulcrum(ctx1, &pb1.NewCity1{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action, Sender: "ahsoka"})
 				if errr != nil {
 					log.Fatalf("could not create city in fulcrum: %v", errr)
 				}
