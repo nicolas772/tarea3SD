@@ -29,13 +29,13 @@ func (s *BrokerServer) CityMgmtBroker(ctx context.Context, in *pb.NewCity) (*pb.
 	log.Printf("Received from %v: %v", in.GetSender(), in.GetNuevoValor())
 	log.Printf("Received from %v: %v", in.GetSender(), in.GetAction())
 	rand.Seed(int64(time.Now().UnixNano()))
-	//direcciones_fulcrum := [3]string{"localhost:50052", "localhost:50053", "localhost:50054"}
-	//direccion := direcciones_fulcrum[rand.Intn(3)]
+	direcciones_fulcrum_ahsoka := [3]string{"localhost:50055", "localhost:50056", "localhost:50057"}
+	direcciones_fulcrum_almirante := [3]string{"localhost:50058", "localhost:50059", "localhost:50060"}
 	var direccion string
 	if in.GetSender() == "almirante" {
-		direccion = "localhost:50052" //este debe ser aleatorio
+		direccion = direcciones_fulcrum_almirante[rand.Intn(3)]
 	} else {
-		direccion = "localhost:50055"
+		direccion = direcciones_fulcrum_ahsoka[rand.Intn(3)]
 	}
 	//este debe ser aleatorio
 	return &pb.RespBroker1{DireccionServidor: direccion}, nil
@@ -47,10 +47,9 @@ func (s *BrokerServer) CityLeiaBroker(ctx context.Context, in *pb.NewCity) (*pb.
 	planeta := in.GetNombrePlaneta()
 	ciudad := in.GetNombreCiudad()
 	action := in.GetAction()
-	servidor_contactado := "localhost:50052" //este debe ser aleatorio
-	//direcciones_fulcrum := [3]string{"localhost:50052", "localhost:50053", "localhost:50054"}
-	//direccion := direcciones_fulcrum[rand.Intn(3)]
-
+	direcciones_fulcrum_broker := [3]string{"localhost:50061", "localhost:50062", "localhost:50063"}
+	servidor_contactado := direcciones_fulcrum_broker[rand.Intn(3)]
+	fmt.Println("servidor contactado para leia:", servidor_contactado)
 	conn, err := grpc.Dial(servidor_contactado, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)

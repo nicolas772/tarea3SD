@@ -15,11 +15,11 @@ import (
 )
 
 const (
-	port_almirante           = ":50058"
-	port_broker              = ":50061"
-	port_ahsoka              = ":50055"
-	path_registro_planetario = "./fulcrum1/registrosPlanetarios/"
-	path_log_registro        = "./fulcrum1/logRegistros/"
+	port_almirante           = ":50059"
+	port_broker              = ":50062"
+	port_ahsoka              = ":50056"
+	path_registro_planetario = "./fulcrum2/registrosPlanetarios/"
+	path_log_registro        = "./fulcrum2/logRegistros/"
 )
 
 func NewFulcrumServer() *FulcrumServer {
