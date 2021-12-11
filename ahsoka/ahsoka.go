@@ -86,7 +86,7 @@ func main() {
 					cant_soldados = split[3]
 				}
 
-				ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+				ctx, cancel := context.WithTimeout(context.Background(), time.Second*100)
 				defer cancel()
 				vector_reloj, ultimo_servidor := BuscarRelojVectorYServidor(planeta, almirante_server)
 				r, err := c.CityMgmtBroker(ctx, &pb.NewCity{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action, NuevoValor: &cant_soldados, Sender: "ahsoka", RelojVector: vector_reloj, UltimoServidor: &ultimo_servidor})

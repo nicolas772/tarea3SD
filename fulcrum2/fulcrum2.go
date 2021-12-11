@@ -174,13 +174,13 @@ func (s *FulcrumServer) CityMgmtFulcrum(ctx context.Context, in *pb.NewCity1) (*
 	vector_retorno := &pb.RespFulcrum1{}
 	for _, vect := range s.vectores_list.Vectores {
 		if vect.Planeta == planeta {
-			vect.RelojVector[0]++ //aumento en 1 la cantidad de cambios
+			vect.RelojVector[1]++ //aumento en 1 la cantidad de cambios
 			no_vector_creado = false
 			vector_retorno = vect
 		}
 	}
 	if no_vector_creado {
-		created_vector := &pb.RespFulcrum1{RelojVector: []int32{1, 0, 0}, Planeta: planeta}
+		created_vector := &pb.RespFulcrum1{RelojVector: []int32{0, 1, 0}, Planeta: planeta}
 		s.vectores_list.Vectores = append(s.vectores_list.Vectores, created_vector)
 		vector_retorno = created_vector
 	}
