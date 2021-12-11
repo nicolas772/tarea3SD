@@ -43,6 +43,18 @@ func ActualizarListaRegistro(planet string, server string, a *AhsokaServer, rv [
 	}
 }
 
+func BuscarRelojVectorYServidor(planeta string, s *AhsokaServer) ([]int32, string) {
+	vector_retorno := []int32{0, 0, 0}
+	ultimo_servidor := ""
+	for _, vect := range s.registros_modificados_list.Registros {
+		if vect.Planeta == planeta {
+			vector_retorno = vect.RelojVector
+			ultimo_servidor = vect.UltimoServidorFulcrum
+		}
+	}
+	return vector_retorno, ultimo_servidor
+}
+
 func main() {
 	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
@@ -76,7 +88,8 @@ func main() {
 
 				ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 				defer cancel()
-				r, err := c.CityMgmtBroker(ctx, &pb.NewCity{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action, NuevoValor: &cant_soldados, Sender: "ahsoka"})
+				vector_reloj, ultimo_servidor := BuscarRelojVectorYServidor(planeta, almirante_server)
+				r, err := c.CityMgmtBroker(ctx, &pb.NewCity{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action, NuevoValor: &cant_soldados, Sender: "ahsoka", RelojVector: vector_reloj, UltimoServidor: &ultimo_servidor})
 				if err != nil {
 					log.Fatalf("could not create city in broker: %v", err)
 				}
@@ -108,7 +121,8 @@ func main() {
 				cant_soldados := split[3]
 				ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 				defer cancel()
-				r, err := c.CityMgmtBroker(ctx, &pb.NewCity{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action, NuevoValor: &cant_soldados, Sender: "ahsoka"})
+				vector_reloj, ultimo_servidor := BuscarRelojVectorYServidor(planeta, almirante_server)
+				r, err := c.CityMgmtBroker(ctx, &pb.NewCity{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action, NuevoValor: &cant_soldados, Sender: "ahsoka", RelojVector: vector_reloj, UltimoServidor: &ultimo_servidor})
 				if err != nil {
 					log.Fatalf("could not create city: %v", err)
 				}
@@ -138,7 +152,8 @@ func main() {
 				action := split[0]
 				ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 				defer cancel()
-				r, err := c.CityMgmtBroker(ctx, &pb.NewCity{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action, Sender: "ahsoka"})
+				vector_reloj, ultimo_servidor := BuscarRelojVectorYServidor(planeta, almirante_server)
+				r, err := c.CityMgmtBroker(ctx, &pb.NewCity{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action, Sender: "ahsoka", RelojVector: vector_reloj, UltimoServidor: &ultimo_servidor})
 				if err != nil {
 					log.Fatalf("could not create city: %v", err)
 				}

@@ -23,15 +23,82 @@ type BrokerServer struct {
 	pb.UnimplementedStarWarsServer
 }
 
+func PreguntarRelojFul1(planeta string) []int32 {
+	direccion := "localhost:50061"
+
+	conn, err := grpc.Dial(direccion, grpc.WithInsecure(), grpc.WithBlock())
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	defer conn.Close()
+	c := pb1.NewStarWars1Client(conn)
+	ctx1, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	r, err := c.RelojesBrokerFulcrum(ctx1, &pb1.Planeta{NombrePlaneta: planeta})
+	if err != nil {
+		log.Fatalln(err)
+	}
+	reloj_vector_resp := r.GetRelojVector()
+	return reloj_vector_resp
+}
+func PreguntarRelojFul2(planeta string) []int32 {
+	direccion := "localhost:50062"
+
+	conn, err := grpc.Dial(direccion, grpc.WithInsecure(), grpc.WithBlock())
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	defer conn.Close()
+	c := pb1.NewStarWars1Client(conn)
+	ctx1, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	r, err := c.RelojesBrokerFulcrum(ctx1, &pb1.Planeta{NombrePlaneta: planeta})
+	if err != nil {
+		log.Fatalln(err)
+	}
+	reloj_vector_resp := r.GetRelojVector()
+	return reloj_vector_resp
+}
+func PreguntarRelojFul3(planeta string) []int32 {
+	direccion := "localhost:50063"
+
+	conn, err := grpc.Dial(direccion, grpc.WithInsecure(), grpc.WithBlock())
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	defer conn.Close()
+	c := pb1.NewStarWars1Client(conn)
+	ctx1, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	r, err := c.RelojesBrokerFulcrum(ctx1, &pb1.Planeta{NombrePlaneta: planeta})
+	if err != nil {
+		log.Fatalln(err)
+	}
+	reloj_vector_resp := r.GetRelojVector()
+	return reloj_vector_resp
+}
+
 func (s *BrokerServer) CityMgmtBroker(ctx context.Context, in *pb.NewCity) (*pb.RespBroker1, error) {
 	log.Printf("Received from %v: %v", in.GetSender(), in.GetNombrePlaneta())
 	log.Printf("Received from %v: %v", in.GetSender(), in.GetNombreCiudad())
 	log.Printf("Received from %v: %v", in.GetSender(), in.GetNuevoValor())
 	log.Printf("Received from %v: %v", in.GetSender(), in.GetAction())
+	log.Printf("Received from %v: %v", in.GetSender(), in.GetRelojVector())
 	rand.Seed(int64(time.Now().UnixNano()))
 	direcciones_fulcrum_ahsoka := [3]string{"localhost:50055", "localhost:50056", "localhost:50057"}
 	direcciones_fulcrum_almirante := [3]string{"localhost:50058", "localhost:50059", "localhost:50060"}
 	var direccion string
+	reloj_from_informante := in.GetRelojVector()
+	ultimo_servidor := in.GetUltimoServidor()
+	reloj_fulcrum1 := PreguntarRelojFul1(in.GetNombrePlaneta())
+	reloj_fulcrum2 := PreguntarRelojFul2(in.GetNombrePlaneta())
+	reloj_fulcrum3 := PreguntarRelojFul3(in.GetNombrePlaneta())
+	fmt.Println("reloj from informante: ", reloj_from_informante)
+	fmt.Println("ultimo servidor from informante: ", ultimo_servidor)
+	fmt.Println("reloj fulcrum 1: ", reloj_fulcrum1)
+	fmt.Println("reloj fulcrum 2: ", reloj_fulcrum2)
+	fmt.Println("reloj fulcrum 3: ", reloj_fulcrum3)
+
 	if in.GetSender() == "almirante" {
 		direccion = direcciones_fulcrum_almirante[rand.Intn(3)]
 	} else {

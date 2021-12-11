@@ -15,6 +15,8 @@ message NewCity {
     string action = 3;
     optional string nuevo_valor = 4;
     string sender = 5;
+    repeated int32 reloj_vector = 6;
+    optional string ultimo_servidor = 7;
 }
 
 message RespBroker1 {

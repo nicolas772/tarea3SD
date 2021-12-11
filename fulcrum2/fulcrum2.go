@@ -212,6 +212,13 @@ func (s *FulcrumServer) CityBrokerFulcrum(ctx context.Context, in *pb.NewCity1) 
 	return &pb.RespFulcrum2{CantRebeldes: int32(cant_rebeldes), RelojVector: reloj_vector, ServidorContactado: "Fulcrum1"}, nil
 }
 
+func (s *FulcrumServer) RelojesBrokerFulcrum(ctx context.Context, in *pb.Planeta) (*pb.RespFulcrum1, error) {
+	log.Printf("Received from Broker: %v", in.GetNombrePlaneta())
+	planeta_consultado := in.GetNombrePlaneta()
+	reloj_vector := BuscarRelojVector(planeta_consultado, s)
+	return &pb.RespFulcrum1{RelojVector: reloj_vector, Planeta: planeta_consultado}, nil
+}
+
 func main() {
 	var fulcrum_server *FulcrumServer = NewFulcrumServer()
 	//conexion con Almirante

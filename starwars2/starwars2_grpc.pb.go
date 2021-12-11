@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 type StarWars1Client interface {
 	CityMgmtFulcrum(ctx context.Context, in *NewCity1, opts ...grpc.CallOption) (*RespFulcrum1, error)
 	CityBrokerFulcrum(ctx context.Context, in *NewCity1, opts ...grpc.CallOption) (*RespFulcrum2, error)
+	RelojesBrokerFulcrum(ctx context.Context, in *Planeta, opts ...grpc.CallOption) (*RespFulcrum1, error)
 }
 
 type starWars1Client struct {
@@ -48,12 +49,22 @@ func (c *starWars1Client) CityBrokerFulcrum(ctx context.Context, in *NewCity1, o
 	return out, nil
 }
 
+func (c *starWars1Client) RelojesBrokerFulcrum(ctx context.Context, in *Planeta, opts ...grpc.CallOption) (*RespFulcrum1, error) {
+	out := new(RespFulcrum1)
+	err := c.cc.Invoke(ctx, "/starwars2.StarWars1/RelojesBrokerFulcrum", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // StarWars1Server is the server API for StarWars1 service.
 // All implementations must embed UnimplementedStarWars1Server
 // for forward compatibility
 type StarWars1Server interface {
 	CityMgmtFulcrum(context.Context, *NewCity1) (*RespFulcrum1, error)
 	CityBrokerFulcrum(context.Context, *NewCity1) (*RespFulcrum2, error)
+	RelojesBrokerFulcrum(context.Context, *Planeta) (*RespFulcrum1, error)
 	mustEmbedUnimplementedStarWars1Server()
 }
 
@@ -66,6 +77,9 @@ func (UnimplementedStarWars1Server) CityMgmtFulcrum(context.Context, *NewCity1) 
 }
 func (UnimplementedStarWars1Server) CityBrokerFulcrum(context.Context, *NewCity1) (*RespFulcrum2, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CityBrokerFulcrum not implemented")
+}
+func (UnimplementedStarWars1Server) RelojesBrokerFulcrum(context.Context, *Planeta) (*RespFulcrum1, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RelojesBrokerFulcrum not implemented")
 }
 func (UnimplementedStarWars1Server) mustEmbedUnimplementedStarWars1Server() {}
 
@@ -116,6 +130,24 @@ func _StarWars1_CityBrokerFulcrum_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _StarWars1_RelojesBrokerFulcrum_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Planeta)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StarWars1Server).RelojesBrokerFulcrum(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/starwars2.StarWars1/RelojesBrokerFulcrum",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StarWars1Server).RelojesBrokerFulcrum(ctx, req.(*Planeta))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // StarWars1_ServiceDesc is the grpc.ServiceDesc for StarWars1 service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -130,6 +162,10 @@ var StarWars1_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CityBrokerFulcrum",
 			Handler:    _StarWars1_CityBrokerFulcrum_Handler,
+		},
+		{
+			MethodName: "RelojesBrokerFulcrum",
+			Handler:    _StarWars1_RelojesBrokerFulcrum_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
