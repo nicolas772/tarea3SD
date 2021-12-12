@@ -21,6 +21,8 @@ type StarWars1Client interface {
 	CityMgmtFulcrum(ctx context.Context, in *NewCity1, opts ...grpc.CallOption) (*RespFulcrum1, error)
 	CityBrokerFulcrum(ctx context.Context, in *NewCity1, opts ...grpc.CallOption) (*RespFulcrum2, error)
 	RelojesBrokerFulcrum(ctx context.Context, in *Planeta, opts ...grpc.CallOption) (*RespFulcrum1, error)
+	ConsistenciaEventual(ctx context.Context, in *SolMerge, opts ...grpc.CallOption) (*RespBroker3, error)
+	PreguntarRelojesYRegistros(ctx context.Context, in *SolMerge, opts ...grpc.CallOption) (*RelojesYRegistros, error)
 }
 
 type starWars1Client struct {
@@ -58,6 +60,24 @@ func (c *starWars1Client) RelojesBrokerFulcrum(ctx context.Context, in *Planeta,
 	return out, nil
 }
 
+func (c *starWars1Client) ConsistenciaEventual(ctx context.Context, in *SolMerge, opts ...grpc.CallOption) (*RespBroker3, error) {
+	out := new(RespBroker3)
+	err := c.cc.Invoke(ctx, "/starwars2.StarWars1/consistenciaEventual", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *starWars1Client) PreguntarRelojesYRegistros(ctx context.Context, in *SolMerge, opts ...grpc.CallOption) (*RelojesYRegistros, error) {
+	out := new(RelojesYRegistros)
+	err := c.cc.Invoke(ctx, "/starwars2.StarWars1/preguntarRelojesYRegistros", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // StarWars1Server is the server API for StarWars1 service.
 // All implementations must embed UnimplementedStarWars1Server
 // for forward compatibility
@@ -65,6 +85,8 @@ type StarWars1Server interface {
 	CityMgmtFulcrum(context.Context, *NewCity1) (*RespFulcrum1, error)
 	CityBrokerFulcrum(context.Context, *NewCity1) (*RespFulcrum2, error)
 	RelojesBrokerFulcrum(context.Context, *Planeta) (*RespFulcrum1, error)
+	ConsistenciaEventual(context.Context, *SolMerge) (*RespBroker3, error)
+	PreguntarRelojesYRegistros(context.Context, *SolMerge) (*RelojesYRegistros, error)
 	mustEmbedUnimplementedStarWars1Server()
 }
 
@@ -80,6 +102,12 @@ func (UnimplementedStarWars1Server) CityBrokerFulcrum(context.Context, *NewCity1
 }
 func (UnimplementedStarWars1Server) RelojesBrokerFulcrum(context.Context, *Planeta) (*RespFulcrum1, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RelojesBrokerFulcrum not implemented")
+}
+func (UnimplementedStarWars1Server) ConsistenciaEventual(context.Context, *SolMerge) (*RespBroker3, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ConsistenciaEventual not implemented")
+}
+func (UnimplementedStarWars1Server) PreguntarRelojesYRegistros(context.Context, *SolMerge) (*RelojesYRegistros, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PreguntarRelojesYRegistros not implemented")
 }
 func (UnimplementedStarWars1Server) mustEmbedUnimplementedStarWars1Server() {}
 
@@ -148,6 +176,42 @@ func _StarWars1_RelojesBrokerFulcrum_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _StarWars1_ConsistenciaEventual_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SolMerge)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StarWars1Server).ConsistenciaEventual(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/starwars2.StarWars1/consistenciaEventual",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StarWars1Server).ConsistenciaEventual(ctx, req.(*SolMerge))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _StarWars1_PreguntarRelojesYRegistros_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SolMerge)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StarWars1Server).PreguntarRelojesYRegistros(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/starwars2.StarWars1/preguntarRelojesYRegistros",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StarWars1Server).PreguntarRelojesYRegistros(ctx, req.(*SolMerge))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // StarWars1_ServiceDesc is the grpc.ServiceDesc for StarWars1 service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -166,6 +230,14 @@ var StarWars1_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RelojesBrokerFulcrum",
 			Handler:    _StarWars1_RelojesBrokerFulcrum_Handler,
+		},
+		{
+			MethodName: "consistenciaEventual",
+			Handler:    _StarWars1_ConsistenciaEventual_Handler,
+		},
+		{
+			MethodName: "preguntarRelojesYRegistros",
+			Handler:    _StarWars1_PreguntarRelojesYRegistros_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

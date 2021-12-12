@@ -8,6 +8,28 @@ service StarWars1 {
     rpc CityMgmtFulcrum (NewCity1) returns (RespFulcrum1) {}
     rpc CityBrokerFulcrum (NewCity1) returns (RespFulcrum2) {}
     rpc RelojesBrokerFulcrum (Planeta) returns (RespFulcrum1) {}
+    rpc consistenciaEventual (SolMerge) returns (RespBroker3) {} 
+    rpc preguntarRelojesYRegistros (SolMerge) returns (RelojesYRegistros) {}
+}
+
+message RegistroUnitario{
+    repeated string array = 1;
+}
+
+message RegistroList{
+    repeated RegistroUnitario registr = 1;
+}
+
+message RelojesYRegistros{
+    VectoresList lista_vectores = 1;
+    RegistroList log_registros = 2;
+}
+
+message SolMerge{
+    bool hacer_merge = 1;
+}
+message RespBroker3{
+    bool se_hizo_merge = 1;
 }
 
 message NewCity1 {

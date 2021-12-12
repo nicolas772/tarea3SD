@@ -207,6 +207,28 @@ func getCandidato(sender string, dir_ultimo_servidor string, reloj_from_informan
 	return candidato
 }
 
+func merge()bool{
+	direccion := "localhost:50061"
+
+	conn, err := grpc.Dial(direccion, grpc.WithInsecure(), grpc.WithBlock())
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	defer conn.Close()
+	//conección con Falcrum1
+	c := pb1.NewStarWars1Client(conn)
+	ctx1, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	r, err := c.ConsistenciaEventual(ctx1, &pb1.SolMerge{HacerMerge: true})
+	if err != nil {
+		log.Fatalln(err)
+	}
+	if !r.SeHizoMerge {
+		return r.SeHizoMerge
+	}
+	return r.SeHizoMerge
+}
+
 func (s *BrokerServer) CityMgmtBroker(ctx context.Context, in *pb.NewCity) (*pb.RespBroker1, error) {
 	log.Printf("Received from %v: %v", in.GetSender(), in.GetNombrePlaneta())
 	log.Printf("Received from %v: %v", in.GetSender(), in.GetNombreCiudad())
@@ -234,6 +256,7 @@ func (s *BrokerServer) CityMgmtBroker(ctx context.Context, in *pb.NewCity) (*pb.
 		direccion = ""
 		fmt.Println("hay que hacer merge")
 		//codear una funcion para hacer merge y llamarla aqui!!!
+		merge()
 	}
 
 	return &pb.RespBroker1{DireccionServidor: direccion}, nil
@@ -264,6 +287,8 @@ func (s *BrokerServer) CityLeiaBroker(ctx context.Context, in *pb.NewCity) (*pb.
 	reloj_vector := r.GetRelojVector()
 	return &pb.RespBroker2{CantRebeldes: int32(cant_rebeldes), RelojVector: reloj_vector, ServidorContactado: servidor_contactado}, nil
 }
+
+
 
 func main() {
 	//Conexion con almirante

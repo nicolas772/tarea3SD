@@ -83,6 +83,15 @@ func escribeArchivo(texto string, path string) {
 	//fmt.Println("Archivo actualizado existosamente.")
 }
 
+func leerArchivo(path string) []string {
+	var input, err = ioutil.ReadFile(path)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	lines := strings.Split(string(input), "\n")
+	return lines
+}
+
 func existeError(err error) bool {
 	if err != nil {
 		fmt.Println(err.Error())
@@ -241,6 +250,17 @@ func (s *FulcrumServer) RelojesBrokerFulcrum(ctx context.Context, in *pb.Planeta
 	planeta_consultado := in.GetNombrePlaneta()
 	reloj_vector := BuscarRelojVector(planeta_consultado, s)
 	return &pb.RespFulcrum1{RelojVector: reloj_vector, Planeta: planeta_consultado}, nil
+}
+
+func (s *FulcrumServer) PreguntarRelojesYRegistros(ctx context.Context, in *pb.SolMerge) (*pb.RelojesYRegistros, error) {
+	resultado := &pb.RelojesYRegistros{}
+	//leemos vectores del servidor
+	for _, vect := range s.vectores_list.Vectores {
+		resultado.ListaVectores.Vectores = append(resultado.ListaVectores.Vectores, vect)//agregamos el vector a los vectores
+		registro := leerArchivo(path_log_registro + vect.Planeta + ".txt")
+		resultado.LogRegistros.Registr = append(resultado.LogRegistros.Registr, &pb.RegistroUnitario{Array: registro})//agregamos el registro al vector de registros
+	}
+	return resultado, nil
 }
 
 func main() {

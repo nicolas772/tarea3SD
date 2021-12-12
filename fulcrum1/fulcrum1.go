@@ -9,6 +9,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	pb "example.com/go-starwars-grpc/starwars2"
 	"google.golang.org/grpc"
@@ -43,6 +44,15 @@ func (server *FulcrumServer) Run(port string) error {
 	pb.RegisterStarWars1Server(s, server)
 	log.Printf("server listening at %v", lis.Addr())
 	return s.Serve(lis)
+}
+
+func leerArchivo(path string) []string {
+	var input, err = ioutil.ReadFile(path)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	lines := strings.Split(string(input), "\n")
+	return lines
 }
 
 func crearArchivo(path string) {
@@ -241,6 +251,66 @@ func (s *FulcrumServer) RelojesBrokerFulcrum(ctx context.Context, in *pb.Planeta
 	planeta_consultado := in.GetNombrePlaneta()
 	reloj_vector := BuscarRelojVector(planeta_consultado, s)
 	return &pb.RespFulcrum1{RelojVector: reloj_vector, Planeta: planeta_consultado}, nil
+}
+
+func PreguntarFul2() *pb.RelojesYRegistros {
+	direccion := "localhost:50062"
+
+	conn, err := grpc.Dial(direccion, grpc.WithInsecure(), grpc.WithBlock())
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	defer conn.Close()
+	c := pb.NewStarWars1Client(conn)
+	ctx1, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	r, err := c.PreguntarRelojesYRegistros(ctx1, &pb.SolMerge{HacerMerge: true})
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return r
+}
+
+func PreguntarFul3() *pb.RelojesYRegistros {
+	direccion := "localhost:50063"
+
+	conn, err := grpc.Dial(direccion, grpc.WithInsecure(), grpc.WithBlock())
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	defer conn.Close()
+	c := pb.NewStarWars1Client(conn)
+	ctx1, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	r, err := c.PreguntarRelojesYRegistros(ctx1, &pb.SolMerge{HacerMerge: true})
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return r
+}
+
+func (s *FulcrumServer) consistenciaEventual(ctx context.Context, in *pb.SolMerge) (*pb.RespBroker3, error) {
+	seHizo := false
+	//Reglas: el servictor que tenga más cambios en un planeta tiene prioridad
+	fulcrum1 := &pb.RelojesYRegistros{}
+
+	for _, vect := range s.vectores_list.Vectores {
+		fulcrum1.ListaVectores.Vectores = append(fulcrum1.ListaVectores.Vectores, vect)//agregamos el vector a los vectores
+		registro := leerArchivo(path_log_registro + vect.Planeta + ".txt")
+		fulcrum1.LogRegistros.Registr = append(fulcrum1.LogRegistros.Registr, &pb.RegistroUnitario{Array: registro})//agregamos el registro al vector de registros
+	}
+	//Buscar Información de los otros servidores Fulcrum
+	fulcrum2 := PreguntarFul2()
+	fulcrum3 := PreguntarFul3()
+
+	//Comenzar consistencia eventual
+	arregloAdds := []string{}
+	iterador := 0
+	
+
+	
+	seHizo = true
+	return &pb.RespBroker3{SeHizoMerge: seHizo}, nil
 }
 
 func main() {
