@@ -289,8 +289,108 @@ func PreguntarFul3() *pb.RelojesYRegistros {
 	return r
 }
 
+func planetasEnServidores(f1 *pb.RelojesYRegistros, f2 *pb.RelojesYRegistros, f3 *pb.RelojesYRegistros) []string {
+	lista_planetas := []string{}
+	estaPlaneta := false
+	//Fulcrum1
+	for _, planeta := range f1.ListaVectores.Vectores {
+		for _, planeta2 := range lista_planetas {
+			if planeta2 == planeta.Planeta {
+				estaPlaneta = true
+			}
+		}
+		if !estaPlaneta {
+			lista_planetas = append(lista_planetas, planeta.Planeta)
+		}
+	}
+	//Fulcrum2
+	for _, planeta := range f2.ListaVectores.Vectores {
+		for _, planeta2 := range lista_planetas {
+			if planeta2 == planeta.Planeta {
+				estaPlaneta = true
+			}
+		}
+		if !estaPlaneta {
+			lista_planetas = append(lista_planetas, planeta.Planeta)
+		}
+	}
+	//Fulcrum3
+	for _, planeta := range f3.ListaVectores.Vectores {
+		for _, planeta2 := range lista_planetas {
+			if planeta2 == planeta.Planeta {
+				estaPlaneta = true
+			}
+		}
+		if !estaPlaneta {
+			lista_planetas = append(lista_planetas, planeta.Planeta)
+		}
+	}
+	return lista_planetas
+
+}
+
+func agregarPlanetas(arregloPlanetas []string, f1 *pb.RelojesYRegistros, f2 *pb.RelojesYRegistros, f3 *pb.RelojesYRegistros) int {
+	inPlaneta := false
+	relojPlaneta := []int32{0,0,0}
+	posicionF1 := 0
+	posicionF2 := 0
+	posicionF3 := 0
+
+	for _, planeta := range arregloPlanetas {
+		//Fulcrum1
+		iterador := 0
+		for _, planeta2 := range f1.ListaVectores.Vectores {
+			if planeta == planeta2.Planeta {
+				relojPlaneta[0]	= planeta2.RelojVector[0]
+				inPlaneta = true
+				posicionF1 = iterador
+			}
+		}
+		if !inPlaneta {//Planeta no se encuentra en el servidor, hay que agregarlo al final
+			f1.ListaVectores.Vectores = append(f1.ListaVectores.Vectores, &pb.Vector{Planeta: planeta, RelojVector: relojPlaneta})
+			posicionF1 = len(f1.ListaVectores.Vectores) - 1
+			
+		}
+		iterador = 0
+		//Fulcrum2
+		for _, planeta2 := range f2.ListaVectores.Vectores {
+			if planeta == planeta2.Planeta {
+				relojPlaneta[1]	= planeta2.RelojVector[1]
+				inPlaneta = true
+				posicionF2 = iterador
+
+			}
+		}
+		if !inPlaneta {//Planeta no se encuentra en el servidor, hay que agregarlo al final
+			f2.ListaVectores.Vectores = append(f2.ListaVectores.Vectores, &pb.Vector{Planeta: planeta, RelojVector: relojPlaneta})
+			posicionF2 = len(f2.ListaVectores.Vectores) - 1
+			
+		}
+		iterador = 0
+		//Fulcrum3
+		for _, planeta2 := range f3.ListaVectores.Vectores {
+			if planeta == planeta2.Planeta {
+				relojPlaneta[2]	= planeta2.RelojVector[2]
+				inPlaneta = true
+				posicionF3 = iterador
+			}
+		}
+		if !inPlaneta {//Planeta no se encuentra en el servidor, hay que agregarlo al final
+			f3.ListaVectores.Vectores = append(f3.ListaVectores.Vectores, &pb.Vector{Planeta: planeta, RelojVector: relojPlaneta})
+			posicionF1 = len(f2.ListaVectores.Vectores) - 1
+			
+		}
+
+		f1.ListaVectores.Vectores[posicionF1].RelojVector = relojPlaneta
+		f2.ListaVectores.Vectores[posicionF2].RelojVector = relojPlaneta
+		f3.ListaVectores.Vectores[posicionF3].RelojVector = relojPlaneta
+		relojPlaneta = []int32{0,0,0}
+	}
+	return 12
+}
 func (s *FulcrumServer) consistenciaEventual(ctx context.Context, in *pb.SolMerge) (*pb.RespBroker3, error) {
 	seHizo := false
+
 	//Reglas: el servictor que tenga más cambios en un planeta tiene prioridad
 	fulcrum1 := &pb.RelojesYRegistros{}
 
@@ -304,11 +404,10 @@ func (s *FulcrumServer) consistenciaEventual(ctx context.Context, in *pb.SolMerg
 	fulcrum3 := PreguntarFul3()
 
 	//Comenzar consistencia eventual
-	arregloAdds := []string{}
-	iterador := 0
-	
-
-	
+	//Misma cantidad de planetas en los servidores (se agregan servidores)
+	arrayPlanetas := planetasEnServidores(fulcrum1, fulcrum2, fulcrum3)
+	a := agregarPlanetas(arrayPlanetas, fulcrum1, fulcrum2, fulcrum3)
+	log.Printf("%d", a)
 	seHizo = true
 	return &pb.RespBroker3{SeHizoMerge: seHizo}, nil
 }
