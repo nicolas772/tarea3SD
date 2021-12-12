@@ -30,7 +30,7 @@ type LeiaServer struct {
 
 func ActualizarListaCiudades(city string, planet string, server string, l *LeiaServer, rv []int32) {
 	no_registro_creado := true
-	if (rv[0] != 0) && (rv[1] != 0) && (rv[2] != 0) {
+	if (rv[0] != 0) || (rv[1] != 0) || (rv[2] != 0) {
 		for _, vect := range l.ciudades_solic_list.Ciudades {
 			if vect.Ciudad == city {
 				vect.RelojVector = rv
@@ -40,6 +40,7 @@ func ActualizarListaCiudades(city string, planet string, server string, l *LeiaS
 			}
 		}
 		if no_registro_creado {
+			fmt.Println("entra a no registro creado")
 			new_city := &pb1.CiudadSolicitada{Ciudad: city, Planeta: planet, RelojVector: rv, UltimoServidorFulcrum: server}
 			l.ciudades_solic_list.Ciudades = append(l.ciudades_solic_list.Ciudades, new_city)
 		}
