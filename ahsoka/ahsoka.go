@@ -63,9 +63,10 @@ func main() {
 	defer conn.Close()
 	c := pb.NewStarWarsClient(conn)
 	no_quit := true
-	var almirante_server *AhsokaServer = NewAhsokaServer()
+	var ahsoka_server *AhsokaServer = NewAhsokaServer()
 	fmt.Println("Bienvenida Ahsoka Tano")
 	for no_quit {
+		fmt.Println("")
 		fmt.Println("Por favor, ingrese el comando. Para salir, presione 'Q'")
 		reader := bufio.NewReader(os.Stdin)
 		entrada, _ := reader.ReadString('\n')         // Leer hasta el separador de salto de línea
@@ -88,7 +89,7 @@ func main() {
 
 				ctx, cancel := context.WithTimeout(context.Background(), time.Second*100)
 				defer cancel()
-				vector_reloj, ultimo_servidor := BuscarRelojVectorYServidor(planeta, almirante_server)
+				vector_reloj, ultimo_servidor := BuscarRelojVectorYServidor(planeta, ahsoka_server)
 				r, err := c.CityMgmtBroker(ctx, &pb.NewCity{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action, NuevoValor: &cant_soldados, Sender: "ahsoka", RelojVector: vector_reloj, UltimoServidor: &ultimo_servidor})
 				if err != nil {
 					log.Fatalf("could not create city in broker: %v", err)
@@ -109,9 +110,14 @@ func main() {
 					log.Fatalf("could not create city in fulcrum: %v", errr)
 				}
 				reloj_vector := r1.GetRelojVector()
+				se_realizo_mod := r1.GetSeRealizoMod()
 				fmt.Println("Reloj vector: ", reloj_vector)
-				ActualizarListaRegistro(planeta, servidor_asignado, almirante_server, reloj_vector)
-				fmt.Println("lista de registros:", almirante_server.registros_modificados_list)
+				if se_realizo_mod == "si" {
+					ActualizarListaRegistro(planeta, servidor_asignado, ahsoka_server, reloj_vector)
+				} else {
+					fmt.Println("No se ha podido realizar la modificacion")
+				}
+				fmt.Println("lista de registros:", ahsoka_server.registros_modificados_list)
 				conn1.Close()
 
 			} else if (split[0] == "UpdateName" || split[0] == "UpdateNumber") && len(split) == 4 { //Comando "UpdateName" y "UpdateNumber"
@@ -121,7 +127,7 @@ func main() {
 				cant_soldados := split[3]
 				ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 				defer cancel()
-				vector_reloj, ultimo_servidor := BuscarRelojVectorYServidor(planeta, almirante_server)
+				vector_reloj, ultimo_servidor := BuscarRelojVectorYServidor(planeta, ahsoka_server)
 				r, err := c.CityMgmtBroker(ctx, &pb.NewCity{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action, NuevoValor: &cant_soldados, Sender: "ahsoka", RelojVector: vector_reloj, UltimoServidor: &ultimo_servidor})
 				if err != nil {
 					log.Fatalf("could not create city: %v", err)
@@ -141,9 +147,14 @@ func main() {
 					log.Fatalf("could not create city in fulcrum: %v", errr)
 				}
 				reloj_vector := r1.GetRelojVector()
+				se_realizo_mod := r1.GetSeRealizoMod()
 				fmt.Println("Reloj vector: ", reloj_vector)
-				ActualizarListaRegistro(planeta, servidor_asignado, almirante_server, reloj_vector)
-				fmt.Println("lista de registros:", almirante_server.registros_modificados_list)
+				if se_realizo_mod == "si" {
+					ActualizarListaRegistro(planeta, servidor_asignado, ahsoka_server, reloj_vector)
+				} else {
+					fmt.Println("No se ha podido realizar la modificacion")
+				}
+				fmt.Println("lista de registros:", ahsoka_server.registros_modificados_list)
 				conn1.Close()
 
 			} else if split[0] == "DeleteCity" && len(split) == 3 { //Comando "DeleteCity"
@@ -152,7 +163,7 @@ func main() {
 				action := split[0]
 				ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 				defer cancel()
-				vector_reloj, ultimo_servidor := BuscarRelojVectorYServidor(planeta, almirante_server)
+				vector_reloj, ultimo_servidor := BuscarRelojVectorYServidor(planeta, ahsoka_server)
 				r, err := c.CityMgmtBroker(ctx, &pb.NewCity{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action, Sender: "ahsoka", RelojVector: vector_reloj, UltimoServidor: &ultimo_servidor})
 				if err != nil {
 					log.Fatalf("could not create city: %v", err)
@@ -172,9 +183,14 @@ func main() {
 					log.Fatalf("could not create city in fulcrum: %v", errr)
 				}
 				reloj_vector := r1.GetRelojVector()
+				se_realizo_mod := r1.GetSeRealizoMod()
 				fmt.Println("Reloj vector: ", reloj_vector)
-				ActualizarListaRegistro(planeta, servidor_asignado, almirante_server, reloj_vector)
-				fmt.Println("lista de registros:", almirante_server.registros_modificados_list)
+				if se_realizo_mod == "si" {
+					ActualizarListaRegistro(planeta, servidor_asignado, ahsoka_server, reloj_vector)
+				} else {
+					fmt.Println("No se ha podido realizar la modificacion")
+				}
+				fmt.Println("lista de registros:", ahsoka_server.registros_modificados_list)
 				conn1.Close()
 
 			} else {

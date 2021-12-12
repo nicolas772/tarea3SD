@@ -66,6 +66,7 @@ func main() {
 	var almirante_server *AlmiranteServer = NewAlmiranteServer()
 	fmt.Println("Bienvenido Almirante Thrawn")
 	for no_quit {
+		fmt.Println("")
 		fmt.Println("Por favor, ingrese el comando. Para salir, presione 'Q'")
 		reader := bufio.NewReader(os.Stdin)
 		entrada, _ := reader.ReadString('\n')         // Leer hasta el separador de salto de línea
@@ -105,15 +106,18 @@ func main() {
 				ctx1, cancel := context.WithTimeout(context.Background(), time.Second)
 				defer cancel()
 
-				//aqui aplicar Read your Writes
-
 				r1, errr := c1.CityMgmtFulcrum(ctx1, &pb1.NewCity1{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action, NuevoValor: &cant_soldados, Sender: "almirante"})
 				if errr != nil {
 					log.Fatalf("could not create city in fulcrum: %v", errr)
 				}
 				reloj_vector := r1.GetRelojVector()
+				se_realizo_mod := r1.GetSeRealizoMod()
 				fmt.Println("Reloj vector: ", reloj_vector)
-				ActualizarListaRegistro(planeta, servidor_asignado, almirante_server, reloj_vector)
+				if se_realizo_mod == "si" {
+					ActualizarListaRegistro(planeta, servidor_asignado, almirante_server, reloj_vector)
+				} else {
+					fmt.Println("No se ha podido realizar la modificacion")
+				}
 				fmt.Println("lista de registros:", almirante_server.registros_modificados_list)
 				conn1.Close()
 
@@ -144,8 +148,13 @@ func main() {
 					log.Fatalf("could not create city in fulcrum: %v", errr)
 				}
 				reloj_vector := r1.GetRelojVector()
+				se_realizo_mod := r1.GetSeRealizoMod()
 				fmt.Println("Reloj vector: ", reloj_vector)
-				ActualizarListaRegistro(planeta, servidor_asignado, almirante_server, reloj_vector)
+				if se_realizo_mod == "si" {
+					ActualizarListaRegistro(planeta, servidor_asignado, almirante_server, reloj_vector)
+				} else {
+					fmt.Println("No se ha podido realizar la modificacion")
+				}
 				fmt.Println("lista de registros:", almirante_server.registros_modificados_list)
 				conn1.Close()
 
@@ -175,8 +184,13 @@ func main() {
 					log.Fatalf("could not create city in fulcrum: %v", errr)
 				}
 				reloj_vector := r1.GetRelojVector()
+				se_realizo_mod := r1.GetSeRealizoMod()
 				fmt.Println("Reloj vector: ", reloj_vector)
-				ActualizarListaRegistro(planeta, servidor_asignado, almirante_server, reloj_vector)
+				if se_realizo_mod == "si" {
+					ActualizarListaRegistro(planeta, servidor_asignado, almirante_server, reloj_vector)
+				} else {
+					fmt.Println("No se ha podido realizar la modificacion")
+				}
 				fmt.Println("lista de registros:", almirante_server.registros_modificados_list)
 				conn1.Close()
 

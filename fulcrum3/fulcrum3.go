@@ -122,7 +122,7 @@ func editarArchivo(path string, ciudad string, valor_nuevo string, modo string) 
 }
 
 func BuscarCantidadRebeldes(planeta string, ciudad string) int {
-	cant_rebeldes := 0
+	cant_rebeldes := -1
 	path := path_registro_planetario + planeta + ".txt"
 	input, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -168,34 +168,58 @@ func (s *FulcrumServer) CityMgmtFulcrum(ctx context.Context, in *pb.NewCity1) (*
 	planeta := in.GetNombrePlaneta()
 	ciudad := in.GetNombreCiudad()
 	valor := in.GetNuevoValor()
-
-	//manejo de vector_reloj
-	no_vector_creado := true
-	vector_retorno := &pb.RespFulcrum1{}
-	for _, vect := range s.vectores_list.Vectores {
-		if vect.Planeta == planeta {
-			vect.RelojVector[2]++ //aumento en 1 la cantidad de cambios
-			no_vector_creado = false
-			vector_retorno = vect
+	cant_rebeldes := BuscarCantidadRebeldes(planeta, ciudad) //si retorna -1, quiere decir que no esta creada la ciudad, en cualquier otro caso, si esta creada
+	//Manejo de archivo RegistroPlanetario
+	ruta2 := path_registro_planetario + planeta + ".txt"
+	pudo_realizar_comando := false
+	if accion == "AddCity" {
+		if cant_rebeldes == -1 {
+			linea_archivo := planeta + " " + ciudad + " " + valor
+			crearArchivo(ruta2)
+			escribeArchivo(linea_archivo, ruta2)
+			pudo_realizar_comando = true
+		} else {
+			fmt.Println("No se puede añadir ciudad, ya esta creada")
+		}
+	} else {
+		if cant_rebeldes >= 0 {
+			editarArchivo(ruta2, ciudad, valor, accion)
+			pudo_realizar_comando = true
+		} else {
+			fmt.Println("No se puede editar o eliminar ciudad que no existe en el registro. El otro informante la elimino o jamas ha sido creada.")
 		}
 	}
-	if no_vector_creado {
-		created_vector := &pb.RespFulcrum1{RelojVector: []int32{0, 0, 1}, Planeta: planeta}
-		s.vectores_list.Vectores = append(s.vectores_list.Vectores, created_vector)
-		vector_retorno = created_vector
-	}
-
-	//Manejo de archivos logRegistro y RegistroPlanetario
-	ruta1 := path_log_registro + planeta + ".txt"
-	crearArchivo(ruta1)
-	escribeArchivo(accion+" "+planeta+" "+ciudad+" "+valor, ruta1)
-	ruta2 := path_registro_planetario + planeta + ".txt"
-	if accion == "AddCity" {
-		linea_archivo := planeta + " " + ciudad + " " + valor
-		crearArchivo(ruta2)
-		escribeArchivo(linea_archivo, ruta2)
-	} else {
-		editarArchivo(ruta2, ciudad, valor, accion)
+	//manejo de vector_reloj y logRegistro
+	vector_retorno := &pb.RespFulcrum1{}
+	if pudo_realizar_comando {
+		ruta1 := path_log_registro + planeta + ".txt"
+		crearArchivo(ruta1) //si ya eviste, no lo crea
+		escribeArchivo(accion+" "+planeta+" "+ciudad+" "+valor, ruta1)
+		no_vector_creado := true
+		for _, vect := range s.vectores_list.Vectores {
+			if vect.Planeta == planeta {
+				vect.RelojVector[2]++ //aumento en 1 la cantidad de cambios
+				no_vector_creado = false
+				vector_retorno = &pb.RespFulcrum1{RelojVector: vect.RelojVector, Planeta: planeta, SeRealizoMod: "si"}
+			}
+		}
+		if no_vector_creado {
+			created_vector := &pb.Vector{RelojVector: []int32{0, 0, 1}, Planeta: planeta}
+			s.vectores_list.Vectores = append(s.vectores_list.Vectores, created_vector)
+			vector_retorno = &pb.RespFulcrum1{RelojVector: created_vector.RelojVector, Planeta: planeta, SeRealizoMod: "si"}
+		}
+	} else { //quiere decir que el informante no pudo realizar cambios
+		existe_planeta := false
+		for _, vect := range s.vectores_list.Vectores {
+			if vect.Planeta == planeta {
+				vector_retorno = &pb.RespFulcrum1{RelojVector: vect.RelojVector, Planeta: planeta, SeRealizoMod: "no"}
+				existe_planeta = true
+			}
+		}
+		if !existe_planeta { //si no existe planeta, retorno un reloj vector nulo
+			vector_aux := &pb.RespFulcrum1{RelojVector: []int32{0, 0, 0}, Planeta: planeta, SeRealizoMod: "no"}
+			vector_retorno = vector_aux
+		}
 	}
 	fmt.Println("vectores list:", s.vectores_list)
 	return vector_retorno, nil

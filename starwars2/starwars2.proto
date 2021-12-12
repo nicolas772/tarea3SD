@@ -25,10 +25,16 @@ message Planeta {
 message RespFulcrum1 {
     repeated int32 reloj_vector = 1;
     string planeta = 2;
+    string se_realizo_mod = 3;
+}
+
+message Vector {
+    repeated int32 reloj_vector = 1;
+    string planeta = 2;
 }
 
 message VectoresList {
-    repeated RespFulcrum1 vectores = 1; 
+    repeated Vector vectores = 1; 
 }
 
 message RegistroModificado {
