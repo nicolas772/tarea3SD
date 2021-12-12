@@ -167,6 +167,7 @@ func getCandidato(sender string, dir_ultimo_servidor string, reloj_from_informan
 	rand.Seed(int64(time.Now().UnixNano()))
 	direcciones_fulcrum_ahsoka := [3]string{"localhost:50055", "localhost:50056", "localhost:50057"}
 	direcciones_fulcrum_almirante := [3]string{"localhost:50058", "localhost:50059", "localhost:50060"}
+	direcciones_fulcrum_broker := [3]string{"localhost:50061", "localhost:50062", "localhost:50063"}
 	index_a_comparar := 0
 	var candidatos []string
 	if sender == "almirante" { //si el sender es almirante
@@ -184,7 +185,7 @@ func getCandidato(sender string, dir_ultimo_servidor string, reloj_from_informan
 		if reloj_fulcrum3[index_a_comparar] >= reloj_from_informante[index_a_comparar] {
 			candidatos = append(candidatos, direcciones_fulcrum_almirante[2])
 		}
-	} else { //si el sender es ahsoka
+	} else if sender == "ahsoka" { //si el sender es ahsoka
 		for i, direccion := range direcciones_fulcrum_ahsoka {
 			if direccion == dir_ultimo_servidor {
 				index_a_comparar = i
@@ -198,6 +199,34 @@ func getCandidato(sender string, dir_ultimo_servidor string, reloj_from_informan
 		}
 		if reloj_fulcrum3[index_a_comparar] >= reloj_from_informante[index_a_comparar] {
 			candidatos = append(candidatos, direcciones_fulcrum_ahsoka[2])
+		}
+	} else if sender == "leia" {
+		if dir_ultimo_servidor != "" {
+			for i, direccion := range direcciones_fulcrum_broker {
+				if direccion == dir_ultimo_servidor {
+					index_a_comparar = i
+				}
+			}
+			if reloj_fulcrum1[index_a_comparar] >= reloj_from_informante[index_a_comparar] {
+				candidatos = append(candidatos, direcciones_fulcrum_broker[0])
+			}
+			if reloj_fulcrum2[index_a_comparar] >= reloj_from_informante[index_a_comparar] {
+				candidatos = append(candidatos, direcciones_fulcrum_broker[1])
+			}
+			if reloj_fulcrum3[index_a_comparar] >= reloj_from_informante[index_a_comparar] {
+				candidatos = append(candidatos, direcciones_fulcrum_broker[2])
+			}
+		}
+		if dir_ultimo_servidor == "" {
+			if (reloj_fulcrum1[0] != 0) || (reloj_fulcrum1[1] != 0) || (reloj_fulcrum1[2] != 0) {
+				candidatos = append(candidatos, direcciones_fulcrum_broker[0])
+			}
+			if (reloj_fulcrum2[0] != 0) || (reloj_fulcrum2[1] != 0) || (reloj_fulcrum2[2] != 0) {
+				candidatos = append(candidatos, direcciones_fulcrum_broker[1])
+			}
+			if (reloj_fulcrum3[0] != 0) || (reloj_fulcrum3[1] != 0) || (reloj_fulcrum3[2] != 0) {
+				candidatos = append(candidatos, direcciones_fulcrum_broker[2])
+			}
 		}
 	}
 	fmt.Println("Candidatos:", candidatos)
@@ -242,11 +271,36 @@ func (s *BrokerServer) CityLeiaBroker(ctx context.Context, in *pb.NewCity) (*pb.
 	log.Printf("Received from Leia: %v", in.GetNombrePlaneta())
 	log.Printf("Received from Leia: %v", in.GetNombreCiudad())
 	log.Printf("Received from Leia: %v", in.GetAction())
+	var servidor_contactado string
 	planeta := in.GetNombrePlaneta()
 	ciudad := in.GetNombreCiudad()
 	action := in.GetAction()
-	direcciones_fulcrum_broker := [3]string{"localhost:50061", "localhost:50062", "localhost:50063"}
-	servidor_contactado := direcciones_fulcrum_broker[rand.Intn(3)]
+	reloj_from_leia := in.GetRelojVector()
+	ultimo_servidor := in.GetUltimoServidor()
+	reloj_fulcrum1 := PreguntarRelojFul1(in.GetNombrePlaneta())
+	reloj_fulcrum2 := PreguntarRelojFul2(in.GetNombrePlaneta())
+	reloj_fulcrum3 := PreguntarRelojFul3(in.GetNombrePlaneta())
+	fmt.Println("reloj from leia: ", reloj_from_leia)
+	fmt.Println("ultimo servidor from leia: ", ultimo_servidor)
+	fmt.Println("reloj fulcrum 1: ", reloj_fulcrum1)
+	fmt.Println("reloj fulcrum 2: ", reloj_fulcrum2)
+	fmt.Println("reloj fulcrum 3: ", reloj_fulcrum3)
+	doMerge := revisarConsistencia(reloj_fulcrum1, reloj_fulcrum2, reloj_fulcrum3)
+	fmt.Println("do merge: ", doMerge)
+	sender := in.GetSender()
+
+	//direcciones_fulcrum_broker := [3]string{"localhost:50061", "localhost:50062", "localhost:50063"}
+	//servidor_contactado := direcciones_fulcrum_broker[rand.Intn(3)]
+
+	if !doMerge { //si no hay que hacer merge, hay que revisar candidatos
+		//direccion = direcciones_fulcrum_almirante[rand.Intn(3)]
+		servidor_contactado = getCandidato(sender, ultimo_servidor, reloj_from_leia, reloj_fulcrum1, reloj_fulcrum2, reloj_fulcrum3)
+	} else {
+		servidor_contactado = ""
+		fmt.Println("hay que hacer merge")
+		//codear una funcion para hacer merge y llamarla aqui!!!
+	}
+
 	fmt.Println("servidor contactado para leia:", servidor_contactado)
 	conn, err := grpc.Dial(servidor_contactado, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
