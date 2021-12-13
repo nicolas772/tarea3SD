@@ -18,6 +18,7 @@ const (
 	port_almirante           = ":50060"
 	port_broker              = ":50063"
 	port_ahsoka              = ":50057"
+	port_fulcrum1			 = ":50065"
 	path_registro_planetario = "./fulcrum3/registrosPlanetarios/"
 	path_log_registro        = "./fulcrum3/logRegistros/"
 )
@@ -253,18 +254,44 @@ func (s *FulcrumServer) RelojesBrokerFulcrum(ctx context.Context, in *pb.Planeta
 }
 
 func (s *FulcrumServer) PreguntarRelojesYRegistros(ctx context.Context, in *pb.SolMerge) (*pb.RelojesYRegistros, error) {
-	resultado := &pb.RelojesYRegistros{}
+	resultado := &pb.RelojesYRegistros{ListaVectores: &pb.VectoresList{}, LogRegistros: &pb.RegistroList{}}
 	//leemos vectores del servidor
 	for _, vect := range s.vectores_list.Vectores {
 		resultado.ListaVectores.Vectores = append(resultado.ListaVectores.Vectores, vect)//agregamos el vector a los vectores
-		registro := leerArchivo(path_log_registro + vect.Planeta + ".txt")
+		registro := leerArchivo(path_registro_planetario + vect.Planeta + ".txt")
 		resultado.LogRegistros.Registr = append(resultado.LogRegistros.Registr, &pb.RegistroUnitario{Array: registro})//agregamos el registro al vector de registros
 	}
+
 	return resultado, nil
+}
+
+func (s *FulcrumServer) MandarFulcrums(ctx context.Context, in *pb.RelojesYRegistros) (*pb.SolMerge, error) {
+	posicion := 0
+	//leemos vectores del servidor
+	for _, vect := range in.LogRegistros.Registr {
+		ruta1 := path_registro_planetario + in.ListaVectores.Vectores[posicion].Planeta + ".txt"
+		os.Remove(ruta1)
+		crearArchivo(ruta1) 
+		ruta2 := path_log_registro + in.ListaVectores.Vectores[posicion].Planeta + ".txt"
+		os.Remove(ruta2)
+		crearArchivo(ruta2) 
+		for _, linea := range vect.Array {
+			escribeArchivo(linea, ruta1)
+		}
+		
+		posicion++
+	}
+	return &pb.SolMerge{HacerMerge: true}, nil
 }
 
 func main() {
 	var fulcrum_server *FulcrumServer = NewFulcrumServer()
+	//Conexión f3-f1
+	go func() {
+		if err := fulcrum_server.Run(port_fulcrum1); err != nil {
+			log.Fatalf("failed to serve: %v", err)
+		}
+	}()
 	//conexion con Almirante
 	go func() {
 		if err := fulcrum_server.Run(port_almirante); err != nil {

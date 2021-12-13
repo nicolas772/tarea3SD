@@ -8,8 +8,9 @@ service StarWars1 {
     rpc CityMgmtFulcrum (NewCity1) returns (RespFulcrum1) {}
     rpc CityBrokerFulcrum (NewCity1) returns (RespFulcrum2) {}
     rpc RelojesBrokerFulcrum (Planeta) returns (RespFulcrum1) {}
-    rpc consistenciaEventual (SolMerge) returns (RespBroker3) {} 
+    rpc ConsistenciaEventual (SolMerge) returns (RespBroker3) {} 
     rpc preguntarRelojesYRegistros (SolMerge) returns (RelojesYRegistros) {}
+    rpc mandarFulcrums (RelojesYRegistros) returns (SolMerge) {}
 }
 
 message RegistroUnitario{

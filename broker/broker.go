@@ -208,18 +208,20 @@ func getCandidato(sender string, dir_ultimo_servidor string, reloj_from_informan
 }
 
 func merge()bool{
-	direccion := "localhost:50061"
+	fmt.Println("Entrando al MERGE")
+	direccion := "localhost:50085"
 
-	conn, err := grpc.Dial(direccion, grpc.WithInsecure(), grpc.WithBlock())
+	conn3, err := grpc.Dial(direccion, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
-	defer conn.Close()
+	defer conn3.Close()
 	//conección con Falcrum1
-	c := pb1.NewStarWars1Client(conn)
-	ctx1, cancel := context.WithTimeout(context.Background(), time.Second)
+	c1 := pb1.NewStarWars1Client(conn3)
+	ctx2, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	r, err := c.ConsistenciaEventual(ctx1, &pb1.SolMerge{HacerMerge: true})
+	r, err := c1.ConsistenciaEventual(ctx2, &pb1.SolMerge{HacerMerge: true})
+	log.Println("------FIN MERGE------")
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -253,10 +255,12 @@ func (s *BrokerServer) CityMgmtBroker(ctx context.Context, in *pb.NewCity) (*pb.
 		//direccion = direcciones_fulcrum_almirante[rand.Intn(3)]
 		direccion = getCandidato(sender, ultimo_servidor, reloj_from_informante, reloj_fulcrum1, reloj_fulcrum2, reloj_fulcrum3)
 	} else {
-		direccion = ""
 		fmt.Println("hay que hacer merge")
 		//codear una funcion para hacer merge y llamarla aqui!!!
+		fmt.Println("Ejecutando MERGE")
 		merge()
+		direccion = getCandidato(sender, ultimo_servidor, reloj_from_informante, reloj_fulcrum1, reloj_fulcrum2, reloj_fulcrum3)
+
 	}
 
 	return &pb.RespBroker1{DireccionServidor: direccion}, nil
@@ -291,6 +295,13 @@ func (s *BrokerServer) CityLeiaBroker(ctx context.Context, in *pb.NewCity) (*pb.
 
 
 func main() {
+	//merge cada 2 minutos
+	go func() {
+		time.Sleep(time.Minute * 2)
+		fmt.Println("Inicio de merge")
+		merge()
+	}()
+	
 	//Conexion con almirante
 	go func() {
 		lis, err := net.Listen("tcp", port_almirante)

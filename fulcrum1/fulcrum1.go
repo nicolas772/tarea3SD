@@ -19,6 +19,7 @@ const (
 	port_almirante           = ":50058"
 	port_broker              = ":50061"
 	port_ahsoka              = ":50055"
+	port_merged		         = ":50085"
 	path_registro_planetario = "./fulcrum1/registrosPlanetarios/"
 	path_log_registro        = "./fulcrum1/logRegistros/"
 )
@@ -52,6 +53,7 @@ func leerArchivo(path string) []string {
 		log.Fatalln(err)
 	}
 	lines := strings.Split(string(input), "\n")
+	fmt.Println(lines[0])
 	return lines
 }
 
@@ -254,7 +256,7 @@ func (s *FulcrumServer) RelojesBrokerFulcrum(ctx context.Context, in *pb.Planeta
 }
 
 func PreguntarFul2() *pb.RelojesYRegistros {
-	direccion := "localhost:50062"
+	direccion := "localhost:50064"
 
 	conn, err := grpc.Dial(direccion, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
@@ -271,8 +273,26 @@ func PreguntarFul2() *pb.RelojesYRegistros {
 	return r
 }
 
+func mandarFul2(f2 *pb.RelojesYRegistros) bool{
+	direccion := "localhost:50064"
+
+	conn, err := grpc.Dial(direccion, grpc.WithInsecure(), grpc.WithBlock())
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	defer conn.Close()
+	c := pb.NewStarWars1Client(conn)
+	ctx1, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	r, err := c.MandarFulcrums(ctx1, f2)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return r.GetHacerMerge()
+}
+
 func PreguntarFul3() *pb.RelojesYRegistros {
-	direccion := "localhost:50063"
+	direccion := "localhost:50065"
 
 	conn, err := grpc.Dial(direccion, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
@@ -287,6 +307,24 @@ func PreguntarFul3() *pb.RelojesYRegistros {
 		log.Fatalln(err)
 	}
 	return r
+}
+
+func mandarFul3(f3 *pb.RelojesYRegistros) bool{
+	direccion := "localhost:50065"
+
+	conn, err := grpc.Dial(direccion, grpc.WithInsecure(), grpc.WithBlock())
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	defer conn.Close()
+	c := pb.NewStarWars1Client(conn)
+	ctx1, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	r, err := c.MandarFulcrums(ctx1, f3)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return r.GetHacerMerge()
 }
 
 func planetasEnServidores(f1 *pb.RelojesYRegistros, f2 *pb.RelojesYRegistros, f3 *pb.RelojesYRegistros) []string {
@@ -326,94 +364,158 @@ func planetasEnServidores(f1 *pb.RelojesYRegistros, f2 *pb.RelojesYRegistros, f3
 		}
 	}
 	return lista_planetas
-
 }
 
-func agregarPlanetas(arregloPlanetas []string, f1 *pb.RelojesYRegistros, f2 *pb.RelojesYRegistros, f3 *pb.RelojesYRegistros) int {
-	inPlaneta := false
+func agregarPlanetasYConsistencia(arregloPlanetas []string, f1 *pb.RelojesYRegistros, f2 *pb.RelojesYRegistros, f3 *pb.RelojesYRegistros) {
 	relojPlaneta := []int32{0,0,0}
 	posicionF1 := 0
 	posicionF2 := 0
 	posicionF3 := 0
+	iterador := 0
 
 	for _, planeta := range arregloPlanetas {
 		//Fulcrum1
-		iterador := 0
+		iterador = 0
+		inPlaneta := false
+		posMayoresCambios := int32(0)
+		cantidadCambios := int32(0)
+
 		for _, planeta2 := range f1.ListaVectores.Vectores {
 			if planeta == planeta2.Planeta {
 				relojPlaneta[0]	= planeta2.RelojVector[0]
 				inPlaneta = true
+				if cantidadCambios <= planeta2.RelojVector[0] {
+					posMayoresCambios = 0
+					cantidadCambios = planeta2.RelojVector[0]
+				} 
 				posicionF1 = iterador
 			}
+			iterador++
 		}
 		if !inPlaneta {//Planeta no se encuentra en el servidor, hay que agregarlo al final
 			f1.ListaVectores.Vectores = append(f1.ListaVectores.Vectores, &pb.Vector{Planeta: planeta, RelojVector: relojPlaneta})
+			f1.LogRegistros.Registr = append(f1.LogRegistros.Registr, &pb.RegistroUnitario{Array: []string{}})
 			posicionF1 = len(f1.ListaVectores.Vectores) - 1
 			
 		}
 		iterador = 0
+		inPlaneta = false
 		//Fulcrum2
 		for _, planeta2 := range f2.ListaVectores.Vectores {
 			if planeta == planeta2.Planeta {
 				relojPlaneta[1]	= planeta2.RelojVector[1]
 				inPlaneta = true
+				if cantidadCambios <= planeta2.RelojVector[1] {
+					posMayoresCambios = 1
+					cantidadCambios = planeta2.RelojVector[1]
+				} 
 				posicionF2 = iterador
-
 			}
+			iterador++
 		}
 		if !inPlaneta {//Planeta no se encuentra en el servidor, hay que agregarlo al final
 			f2.ListaVectores.Vectores = append(f2.ListaVectores.Vectores, &pb.Vector{Planeta: planeta, RelojVector: relojPlaneta})
+			f2.LogRegistros.Registr = append(f2.LogRegistros.Registr, &pb.RegistroUnitario{Array: []string{}})
 			posicionF2 = len(f2.ListaVectores.Vectores) - 1
-			
 		}
 		iterador = 0
+		inPlaneta = false
 		//Fulcrum3
 		for _, planeta2 := range f3.ListaVectores.Vectores {
 			if planeta == planeta2.Planeta {
 				relojPlaneta[2]	= planeta2.RelojVector[2]
 				inPlaneta = true
+				if cantidadCambios <= planeta2.RelojVector[2] {
+					posMayoresCambios = 2
+					cantidadCambios = planeta2.RelojVector[2]
+				} 
 				posicionF3 = iterador
 			}
+			iterador++
 		}
 		if !inPlaneta {//Planeta no se encuentra en el servidor, hay que agregarlo al final
 			f3.ListaVectores.Vectores = append(f3.ListaVectores.Vectores, &pb.Vector{Planeta: planeta, RelojVector: relojPlaneta})
-			posicionF1 = len(f2.ListaVectores.Vectores) - 1
-			
+			f3.LogRegistros.Registr = append(f3.LogRegistros.Registr, &pb.RegistroUnitario{Array: []string{}})
+			posicionF3 = len(f3.ListaVectores.Vectores) - 1	
 		}
 
+		//Se actualizan los relojes de los demas falcrums
 		f1.ListaVectores.Vectores[posicionF1].RelojVector = relojPlaneta
+		
 		f2.ListaVectores.Vectores[posicionF2].RelojVector = relojPlaneta
+		
 		f3.ListaVectores.Vectores[posicionF3].RelojVector = relojPlaneta
+		
+		//Todos misma información
+		if posMayoresCambios == 0 {//fulcrum1 posee más cambios
+			f2.LogRegistros.Registr[posicionF2].Array = f1.LogRegistros.Registr[posicionF1].Array
+			f3.LogRegistros.Registr[posicionF3].Array = f1.LogRegistros.Registr[posicionF1].Array
+		}else if posMayoresCambios == 1 {//fulcrum2 posee más cambios
+			f1.LogRegistros.Registr[posicionF1].Array = f2.LogRegistros.Registr[posicionF2].Array
+			f3.LogRegistros.Registr[posicionF3].Array = f2.LogRegistros.Registr[posicionF2].Array
+		}else{//fulcrum3 posee más cambios
+			f1.LogRegistros.Registr[posicionF1].Array = f3.LogRegistros.Registr[posicionF3].Array
+			f2.LogRegistros.Registr[posicionF2].Array = f3.LogRegistros.Registr[posicionF3].Array
+		}
+		
 		relojPlaneta = []int32{0,0,0}
 	}
-	return 12
+
 }
-func (s *FulcrumServer) consistenciaEventual(ctx context.Context, in *pb.SolMerge) (*pb.RespBroker3, error) {
+func (s *FulcrumServer) ConsistenciaEventual(ctx context.Context, in *pb.SolMerge) (*pb.RespBroker3, error) {
+	posicion := 0
 	seHizo := false
 
 	//Reglas: el servictor que tenga más cambios en un planeta tiene prioridad
-	fulcrum1 := &pb.RelojesYRegistros{}
+	fulcrum1 := &pb.RelojesYRegistros{ListaVectores: &pb.VectoresList{}, LogRegistros: &pb.RegistroList{}}
 
 	for _, vect := range s.vectores_list.Vectores {
+		log.Println(vect.Planeta)
 		fulcrum1.ListaVectores.Vectores = append(fulcrum1.ListaVectores.Vectores, vect)//agregamos el vector a los vectores
 		registro := leerArchivo(path_log_registro + vect.Planeta + ".txt")
 		fulcrum1.LogRegistros.Registr = append(fulcrum1.LogRegistros.Registr, &pb.RegistroUnitario{Array: registro})//agregamos el registro al vector de registros
 	}
+
 	//Buscar Información de los otros servidores Fulcrum
 	fulcrum2 := PreguntarFul2()
 	fulcrum3 := PreguntarFul3()
-
 	//Comenzar consistencia eventual
 	//Misma cantidad de planetas en los servidores (se agregan servidores)
 	arrayPlanetas := planetasEnServidores(fulcrum1, fulcrum2, fulcrum3)
-	a := agregarPlanetas(arrayPlanetas, fulcrum1, fulcrum2, fulcrum3)
-	log.Printf("%d", a)
-	seHizo = true
+	//misma informacion en los servidores
+	agregarPlanetasYConsistencia(arrayPlanetas, fulcrum1, fulcrum2, fulcrum3)
+
+	//Se actualiza fulcrum 1
+	for _, vect := range fulcrum1.LogRegistros.Registr {
+		ruta1 := path_registro_planetario + fulcrum1.ListaVectores.Vectores[posicion].Planeta + ".txt"
+		os.Remove(ruta1)
+		crearArchivo(ruta1) 
+		ruta2 := path_log_registro + fulcrum1.ListaVectores.Vectores[posicion].Planeta + ".txt"
+		os.Remove(ruta2)
+		crearArchivo(ruta2) 
+		for _, linea := range vect.Array {
+			escribeArchivo(linea, ruta1)
+		}
+		
+		posicion++
+	}
+
+	mandarFul2(fulcrum2)
+	mandarFul3(fulcrum3)
+	if mandarFul2(fulcrum2) && mandarFul3(fulcrum3) {
+		seHizo = true
+	}
 	return &pb.RespBroker3{SeHizoMerge: seHizo}, nil
 }
 
 func main() {
 	var fulcrum_server *FulcrumServer = NewFulcrumServer()
+	//solo para el Merge
+	go func() {
+		if err := fulcrum_server.Run(port_merged); err != nil {
+			log.Fatalf("failed to serve: %v", err)
+		}
+	}()
 	//conexion con Almirante
 	go func() {
 		if err := fulcrum_server.Run(port_almirante); err != nil {
