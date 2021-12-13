@@ -30,7 +30,7 @@ type LeiaServer struct {
 
 func ActualizarListaCiudades(city string, planet string, server string, l *LeiaServer, rv []int32) {
 	no_registro_creado := true
-	if (rv[0] != 0) && (rv[1] != 0) && (rv[2] != 0) {
+	if (rv[0] != 0) || (rv[1] != 0) || (rv[2] != 0) {
 		for _, vect := range l.ciudades_solic_list.Ciudades {
 			if vect.Ciudad == city {
 				vect.RelojVector = rv
@@ -44,6 +44,18 @@ func ActualizarListaCiudades(city string, planet string, server string, l *LeiaS
 			l.ciudades_solic_list.Ciudades = append(l.ciudades_solic_list.Ciudades, new_city)
 		}
 	}
+}
+
+func BuscarRelojVectorYServidor(planeta string, s *LeiaServer) ([]int32, string) {
+	vector_retorno := []int32{0, 0, 0}
+	ultimo_servidor := ""
+	for _, vect := range s.ciudades_solic_list.Ciudades {
+		if vect.Planeta == planeta {
+			vector_retorno = vect.RelojVector
+			ultimo_servidor = vect.UltimoServidorFulcrum
+		}
+	}
+	return vector_retorno, ultimo_servidor
 }
 
 func main() {
@@ -73,7 +85,8 @@ func main() {
 				action := split[0]
 				ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 				defer cancel()
-				r, err := c.CityLeiaBroker(ctx, &pb.NewCity{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action})
+				ultimo_vector, ultimo_servidor := BuscarRelojVectorYServidor(planeta, leia_server)
+				r, err := c.CityLeiaBroker(ctx, &pb.NewCity{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action, Sender: "leia", RelojVector: ultimo_vector, UltimoServidor: &ultimo_servidor})
 				if err != nil {
 					log.Fatalf("could not create city in broker: %v", err)
 				}
