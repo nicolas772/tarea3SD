@@ -294,13 +294,6 @@ func (s *BrokerServer) CityLeiaBroker(ctx context.Context, in *pb.NewCity) (*pb.
 
 
 func main() {
-	//merge cada 2 minutos
-	go func() {
-		time.Sleep(time.Minute * 2)
-		fmt.Println("Inicio de merge")
-		merge()
-	}()
-	
 	//Conexion con almirante
 	go func() {
 		lis, err := net.Listen("tcp", port_almirante)
@@ -341,6 +334,14 @@ func main() {
 		log.Printf("server listening at %v", lis2.Addr())
 		if err := s2.Serve(lis2); err != nil {
 			log.Fatalf("failed to serve: %v", err)
+		}
+	}()
+	//merge cada 2 minutos
+	go func() {
+		for{
+			time.Sleep(time.Minute * 2)
+			fmt.Println("Inicio de merge")
+			merge()
 		}
 	}()
 	fmt.Println("Para salir del servidor, presione Q y luego Enter")
