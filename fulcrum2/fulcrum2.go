@@ -275,7 +275,9 @@ func (s *FulcrumServer) MandarFulcrums(ctx context.Context, in *pb.RelojesYRegis
 		os.Remove(ruta2)
 		crearArchivo(ruta2) 
 		for _, linea := range vect.Array {
-			escribeArchivo(linea, ruta1)
+			if (linea != ""){
+				escribeArchivo(linea, ruta1)
+			}
 		}
 		
 		posicion++

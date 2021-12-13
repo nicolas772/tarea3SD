@@ -255,7 +255,6 @@ func (s *BrokerServer) CityMgmtBroker(ctx context.Context, in *pb.NewCity) (*pb.
 		//direccion = direcciones_fulcrum_almirante[rand.Intn(3)]
 		direccion = getCandidato(sender, ultimo_servidor, reloj_from_informante, reloj_fulcrum1, reloj_fulcrum2, reloj_fulcrum3)
 	} else {
-		fmt.Println("hay que hacer merge")
 		//codear una funcion para hacer merge y llamarla aqui!!!
 		fmt.Println("Ejecutando MERGE")
 		merge()

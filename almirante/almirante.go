@@ -118,7 +118,7 @@ func main() {
 				} else {
 					fmt.Println("No se ha podido realizar la modificacion")
 				}
-				fmt.Println("lista de registros:", almirante_server.registros_modificados_list)
+				//fmt.Println("lista de registros:", almirante_server.registros_modificados_list)
 				conn1.Close()
 
 			} else if (split[0] == "UpdateName" || split[0] == "UpdateNumber") && len(split) == 4 { //Comando "UpdateName" y "UpdateNumber"
@@ -155,7 +155,7 @@ func main() {
 				} else {
 					fmt.Println("No se ha podido realizar la modificacion")
 				}
-				fmt.Println("lista de registros:", almirante_server.registros_modificados_list)
+				//fmt.Println("lista de registros:", almirante_server.registros_modificados_list)
 				conn1.Close()
 
 			} else if split[0] == "DeleteCity" && len(split) == 3 { //Comando "DeleteCity"
@@ -191,7 +191,7 @@ func main() {
 				} else {
 					fmt.Println("No se ha podido realizar la modificacion")
 				}
-				fmt.Println("lista de registros:", almirante_server.registros_modificados_list)
+				//fmt.Println("lista de registros:", almirante_server.registros_modificados_list)
 				conn1.Close()
 
 			} else {

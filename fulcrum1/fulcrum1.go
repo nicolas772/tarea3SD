@@ -440,10 +440,8 @@ func agregarPlanetasYConsistencia(arregloPlanetas []string, f1 *pb.RelojesYRegis
 		}
 
 		//Se actualizan los relojes de los demas falcrums
-		f1.ListaVectores.Vectores[posicionF1].RelojVector = relojPlaneta
-		
-		f2.ListaVectores.Vectores[posicionF2].RelojVector = relojPlaneta
-		
+		f1.ListaVectores.Vectores[posicionF1].RelojVector = relojPlaneta	
+		f2.ListaVectores.Vectores[posicionF2].RelojVector = relojPlaneta	
 		f3.ListaVectores.Vectores[posicionF3].RelojVector = relojPlaneta
 		
 		//Todos misma información
@@ -472,7 +470,7 @@ func (s *FulcrumServer) ConsistenciaEventual(ctx context.Context, in *pb.SolMerg
 	for _, vect := range s.vectores_list.Vectores {
 		log.Println(vect.Planeta)
 		fulcrum1.ListaVectores.Vectores = append(fulcrum1.ListaVectores.Vectores, vect)//agregamos el vector a los vectores
-		registro := leerArchivo(path_log_registro + vect.Planeta + ".txt")
+		registro := leerArchivo(path_registro_planetario + vect.Planeta + ".txt")
 		fulcrum1.LogRegistros.Registr = append(fulcrum1.LogRegistros.Registr, &pb.RegistroUnitario{Array: registro})//agregamos el registro al vector de registros
 	}
 
@@ -494,7 +492,9 @@ func (s *FulcrumServer) ConsistenciaEventual(ctx context.Context, in *pb.SolMerg
 		os.Remove(ruta2)
 		crearArchivo(ruta2) 
 		for _, linea := range vect.Array {
-			escribeArchivo(linea, ruta1)
+			if (linea != ""){
+				escribeArchivo(linea, ruta1)
+			}
 		}
 		
 		posicion++
