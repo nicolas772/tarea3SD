@@ -73,7 +73,7 @@ func main() {
 		comando := strings.TrimRight(entrada, "\r\n") // Remover el salto de línea de la entrada del usuario
 
 		if comando == "q" || comando == "Q" {
-			fmt.Println("Hasta pronto Almirante Thrawn")
+			fmt.Println("Hasta pronto Ahsoka Tano")
 			no_quit = false
 		} else {
 			split := strings.Split(comando, " ")
@@ -153,7 +153,6 @@ func main() {
 				} else {
 					fmt.Println("No se ha podido realizar la modificacion")
 				}
-				fmt.Println("lista de registros:", ahsoka_server.registros_modificados_list)
 				conn1.Close()
 
 			} else if split[0] == "DeleteCity" && len(split) == 3 { //Comando "DeleteCity"
@@ -189,7 +188,6 @@ func main() {
 				} else {
 					fmt.Println("No se ha podido realizar la modificacion")
 				}
-				fmt.Println("lista de registros:", ahsoka_server.registros_modificados_list)
 				conn1.Close()
 
 			} else {
