@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	address = "localhost:50054"
+	address = "10.6.40.193:50054"
 )
 
 func NewAhsokaServer() *AhsokaServer {
@@ -117,7 +117,6 @@ func main() {
 				} else {
 					fmt.Println("No se ha podido realizar la modificacion")
 				}
-				fmt.Println("lista de registros:", ahsoka_server.registros_modificados_list)
 				conn1.Close()
 
 			} else if (split[0] == "UpdateName" || split[0] == "UpdateNumber") && len(split) == 4 { //Comando "UpdateName" y "UpdateNumber"

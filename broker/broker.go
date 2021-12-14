@@ -24,7 +24,7 @@ type BrokerServer struct {
 }
 
 func PreguntarRelojFul1(planeta string) []int32 {
-	direccion := "localhost:50061"
+	direccion := "10.6.40.194:50061"
 
 	conn, err := grpc.Dial(direccion, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
@@ -42,7 +42,7 @@ func PreguntarRelojFul1(planeta string) []int32 {
 	return reloj_vector_resp
 }
 func PreguntarRelojFul2(planeta string) []int32 {
-	direccion := "localhost:50062"
+	direccion := "10.6.40.195:50062"
 
 	conn, err := grpc.Dial(direccion, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
@@ -60,7 +60,7 @@ func PreguntarRelojFul2(planeta string) []int32 {
 	return reloj_vector_resp
 }
 func PreguntarRelojFul3(planeta string) []int32 {
-	direccion := "localhost:50063"
+	direccion := "10.6.40.196:50063"
 
 	conn, err := grpc.Dial(direccion, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
@@ -165,9 +165,9 @@ func revisarConsistencia(reloj_fulcrum1 []int32, reloj_fulcrum2 []int32, reloj_f
 func getCandidato(sender string, dir_ultimo_servidor string, reloj_from_informante []int32, reloj_fulcrum1 []int32, reloj_fulcrum2 []int32, reloj_fulcrum3 []int32) string {
 	candidato := ""
 	rand.Seed(int64(time.Now().UnixNano()))
-	direcciones_fulcrum_ahsoka := [3]string{"localhost:50055", "localhost:50056", "localhost:50057"}
-	direcciones_fulcrum_almirante := [3]string{"localhost:50058", "localhost:50059", "localhost:50060"}
-	direcciones_fulcrum_broker := [3]string{"localhost:50061", "localhost:50062", "localhost:50063"}
+	direcciones_fulcrum_ahsoka := [3]string{"10.6.40.194:50055", "10.6.40.195:50056", "10.6.40.196:50057"}
+	direcciones_fulcrum_almirante := [3]string{"10.6.40.194:50058", "10.6.40.195:50059", "10.6.40.196:50060"}
+	direcciones_fulcrum_broker := [3]string{"10.6.40.194:50061", "10.6.40.195:50062", "10.6.40.196:50063"}
 	index_a_comparar := 0
 	var candidatos []string
 	if sender == "almirante" { //si el sender es almirante
@@ -229,7 +229,6 @@ func getCandidato(sender string, dir_ultimo_servidor string, reloj_from_informan
 			}
 		}
 	}
-	fmt.Println("Candidatos:", candidatos)
 	if len(candidatos) != 0 {
 		candidato = candidatos[rand.Intn(len(candidatos))]
 	}
@@ -237,8 +236,9 @@ func getCandidato(sender string, dir_ultimo_servidor string, reloj_from_informan
 }
 
 func merge()bool{
+	fmt.Println("")
 	fmt.Println("Entrando al MERGE")
-	direccion := "localhost:50085"
+	direccion := "10.6.40.194:50085"
 
 	conn3, err := grpc.Dial(direccion, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
@@ -250,7 +250,8 @@ func merge()bool{
 	ctx2, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	r, err := c1.ConsistenciaEventual(ctx2, &pb1.SolMerge{HacerMerge: true})
-	log.Println("------FIN MERGE------")
+	fmt.Println("------FIN MERGE------")
+	fmt.Println("")
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -261,31 +262,28 @@ func merge()bool{
 }
 
 func (s *BrokerServer) CityMgmtBroker(ctx context.Context, in *pb.NewCity) (*pb.RespBroker1, error) {
-	log.Printf("Received from %v: %v", in.GetSender(), in.GetNombrePlaneta())
-	log.Printf("Received from %v: %v", in.GetSender(), in.GetNombreCiudad())
-	log.Printf("Received from %v: %v", in.GetSender(), in.GetNuevoValor())
-	log.Printf("Received from %v: %v", in.GetSender(), in.GetAction())
-	log.Printf("Received from %v: %v", in.GetSender(), in.GetRelojVector())
+	fmt.Println("")
+	fmt.Println("Received from", in.GetSender(), ":", in.GetNombrePlaneta())
+	fmt.Println("Received from", in.GetSender(), ":", in.GetNombreCiudad())
+	fmt.Println("Received from", in.GetSender(), ":", in.GetNuevoValor())
+	fmt.Println("Received from", in.GetSender(), ":", in.GetAction())
+	fmt.Println("Received from", in.GetSender(), ":", in.GetRelojVector())
 	var direccion string
 	reloj_from_informante := in.GetRelojVector()
 	ultimo_servidor := in.GetUltimoServidor()
 	reloj_fulcrum1 := PreguntarRelojFul1(in.GetNombrePlaneta())
 	reloj_fulcrum2 := PreguntarRelojFul2(in.GetNombrePlaneta())
 	reloj_fulcrum3 := PreguntarRelojFul3(in.GetNombrePlaneta())
-	fmt.Println("reloj from informante: ", reloj_from_informante)
-	fmt.Println("ultimo servidor from informante: ", ultimo_servidor)
-	fmt.Println("reloj fulcrum 1: ", reloj_fulcrum1)
-	fmt.Println("reloj fulcrum 2: ", reloj_fulcrum2)
-	fmt.Println("reloj fulcrum 3: ", reloj_fulcrum3)
+	fmt.Println("reloj from informante:", reloj_from_informante)
+	fmt.Println("ultimo servidor from informante:", ultimo_servidor)
 	doMerge := revisarConsistencia(reloj_fulcrum1, reloj_fulcrum2, reloj_fulcrum3)
-	fmt.Println("do merge: ", doMerge)
 	sender := in.GetSender()
 	if !doMerge { //si no hay que hacer merge, hay que revisar candidatos
 		//direccion = direcciones_fulcrum_almirante[rand.Intn(3)]
 		direccion = getCandidato(sender, ultimo_servidor, reloj_from_informante, reloj_fulcrum1, reloj_fulcrum2, reloj_fulcrum3)
 	} else {
 		//codear una funcion para hacer merge y llamarla aqui!!!
-		fmt.Println("Ejecutando MERGE")
+		fmt.Println("Ejecutando MERGE de emergencia")
 		merge()
 		direccion = getCandidato(sender, ultimo_servidor, reloj_from_informante, reloj_fulcrum1, reloj_fulcrum2, reloj_fulcrum3)
 
@@ -294,9 +292,9 @@ func (s *BrokerServer) CityMgmtBroker(ctx context.Context, in *pb.NewCity) (*pb.
 	return &pb.RespBroker1{DireccionServidor: direccion}, nil
 }
 func (s *BrokerServer) CityLeiaBroker(ctx context.Context, in *pb.NewCity) (*pb.RespBroker2, error) {
-	log.Printf("Received from Leia: %v", in.GetNombrePlaneta())
-	log.Printf("Received from Leia: %v", in.GetNombreCiudad())
-	log.Printf("Received from Leia: %v", in.GetAction())
+	fmt.Println("Received from Leia: ", in.GetNombrePlaneta())
+	fmt.Println("Received from Leia: ", in.GetNombreCiudad())
+	fmt.Println("Received from Leia: ", in.GetAction())
 	var servidor_contactado string
 	planeta := in.GetNombrePlaneta()
 	ciudad := in.GetNombreCiudad()
@@ -308,11 +306,7 @@ func (s *BrokerServer) CityLeiaBroker(ctx context.Context, in *pb.NewCity) (*pb.
 	reloj_fulcrum3 := PreguntarRelojFul3(in.GetNombrePlaneta())
 	fmt.Println("reloj from leia: ", reloj_from_leia)
 	fmt.Println("ultimo servidor from leia: ", ultimo_servidor)
-	fmt.Println("reloj fulcrum 1: ", reloj_fulcrum1)
-	fmt.Println("reloj fulcrum 2: ", reloj_fulcrum2)
-	fmt.Println("reloj fulcrum 3: ", reloj_fulcrum3)
 	doMerge := revisarConsistencia(reloj_fulcrum1, reloj_fulcrum2, reloj_fulcrum3)
-	fmt.Println("do merge: ", doMerge)
 	sender := in.GetSender()
 
 	//direcciones_fulcrum_broker := [3]string{"localhost:50061", "localhost:50062", "localhost:50063"}
@@ -322,9 +316,10 @@ func (s *BrokerServer) CityLeiaBroker(ctx context.Context, in *pb.NewCity) (*pb.
 		//direccion = direcciones_fulcrum_almirante[rand.Intn(3)]
 		servidor_contactado = getCandidato(sender, ultimo_servidor, reloj_from_leia, reloj_fulcrum1, reloj_fulcrum2, reloj_fulcrum3)
 	} else {
-		servidor_contactado = ""
-		fmt.Println("hay que hacer merge")
 		//codear una funcion para hacer merge y llamarla aqui!!!
+		fmt.Println("Ejecutando MERGE de emergencia")
+		merge()
+		servidor_contactado = getCandidato(sender, ultimo_servidor, reloj_from_leia, reloj_fulcrum1, reloj_fulcrum2, reloj_fulcrum3)
 	}
 
 	fmt.Println("servidor contactado para leia:", servidor_contactado)
@@ -356,7 +351,7 @@ func main() {
 		}
 		s := grpc.NewServer()
 		pb.RegisterStarWarsServer(s, &BrokerServer{})
-		log.Printf("server listening at %v", lis.Addr())
+		fmt.Println("server listening at ", lis.Addr())
 		if err := s.Serve(lis); err != nil {
 			log.Fatalf("failed to serve: %v", err)
 		}
@@ -371,7 +366,7 @@ func main() {
 
 		s1 := grpc.NewServer()
 		pb.RegisterStarWarsServer(s1, &BrokerServer{})
-		log.Printf("server listening at %v", lis1.Addr())
+		fmt.Println("server listening at ", lis1.Addr())
 		if err := s1.Serve(lis1); err != nil {
 			log.Fatalf("failed to serve: %v", err)
 		}
@@ -385,7 +380,7 @@ func main() {
 
 		s2 := grpc.NewServer()
 		pb.RegisterStarWarsServer(s2, &BrokerServer{})
-		log.Printf("server listening at %v", lis2.Addr())
+		fmt.Println("server listening at ", lis2.Addr())
 		if err := s2.Serve(lis2); err != nil {
 			log.Fatalf("failed to serve: %v", err)
 		}
@@ -394,7 +389,6 @@ func main() {
 	go func() {
 		for{
 			time.Sleep(time.Minute * 2)
-			fmt.Println("Inicio de merge")
 			merge()
 		}
 	}()

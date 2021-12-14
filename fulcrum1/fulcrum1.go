@@ -43,7 +43,7 @@ func (server *FulcrumServer) Run(port string) error {
 
 	s := grpc.NewServer()
 	pb.RegisterStarWars1Server(s, server)
-	log.Printf("server listening at %v", lis.Addr())
+	fmt.Println("server listening at ", lis.Addr())
 	return s.Serve(lis)
 }
 
@@ -172,10 +172,11 @@ func BuscarRelojVector(planeta string, s *FulcrumServer) []int32 {
 }
 
 func (s *FulcrumServer) CityMgmtFulcrum(ctx context.Context, in *pb.NewCity1) (*pb.RespFulcrum1, error) {
-	log.Printf("Received from %v: %v", in.GetSender(), in.GetNombrePlaneta())
-	log.Printf("Received from %v: %v", in.GetSender(), in.GetNombreCiudad())
-	log.Printf("Received from %v: %v", in.GetSender(), in.GetNuevoValor())
-	log.Printf("Received from %v: %v", in.GetSender(), in.GetAction())
+	fmt.Println("")
+	fmt.Println("Received from", in.GetSender(),":", in.GetNombrePlaneta())
+	fmt.Println("Received from", in.GetSender(),":", in.GetNombreCiudad())
+	fmt.Println("Received from", in.GetSender(),":", in.GetNuevoValor())
+	fmt.Println("Received from", in.GetSender(),":", in.GetAction())
 	accion := in.GetAction()
 	planeta := in.GetNombrePlaneta()
 	ciudad := in.GetNombreCiudad()
@@ -233,14 +234,13 @@ func (s *FulcrumServer) CityMgmtFulcrum(ctx context.Context, in *pb.NewCity1) (*
 			vector_retorno = vector_aux
 		}
 	}
-	fmt.Println("vectores list:", s.vectores_list)
 	return vector_retorno, nil
 }
 
 func (s *FulcrumServer) CityBrokerFulcrum(ctx context.Context, in *pb.NewCity1) (*pb.RespFulcrum2, error) {
-	log.Printf("Received from Broker: %v", in.GetNombrePlaneta())
-	log.Printf("Received from Broker: %v", in.GetNombreCiudad())
-	log.Printf("Received from Broker: %v", in.GetAction())
+	fmt.Println("Received from Broker:", in.GetNombrePlaneta())
+	fmt.Println("Received from Broker:", in.GetNombreCiudad())
+	fmt.Println("Received from Broker:", in.GetAction())
 	planeta := in.GetNombrePlaneta()
 	ciudad := in.GetNombreCiudad()
 	cant_rebeldes := BuscarCantidadRebeldes(planeta, ciudad)
@@ -249,14 +249,14 @@ func (s *FulcrumServer) CityBrokerFulcrum(ctx context.Context, in *pb.NewCity1) 
 }
 
 func (s *FulcrumServer) RelojesBrokerFulcrum(ctx context.Context, in *pb.Planeta) (*pb.RespFulcrum1, error) {
-	log.Printf("Received from Broker: %v", in.GetNombrePlaneta())
+	fmt.Println("Received from Broker:", in.GetNombrePlaneta())
 	planeta_consultado := in.GetNombrePlaneta()
 	reloj_vector := BuscarRelojVector(planeta_consultado, s)
 	return &pb.RespFulcrum1{RelojVector: reloj_vector, Planeta: planeta_consultado}, nil
 }
 
 func PreguntarFul2() *pb.RelojesYRegistros {
-	direccion := "localhost:50064"
+	direccion := "10.6.40.195:50064"
 
 	conn, err := grpc.Dial(direccion, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
@@ -274,7 +274,7 @@ func PreguntarFul2() *pb.RelojesYRegistros {
 }
 
 func mandarFul2(f2 *pb.RelojesYRegistros) bool{
-	direccion := "localhost:50064"
+	direccion := "10.6.40.195:50064"
 
 	conn, err := grpc.Dial(direccion, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
@@ -292,7 +292,7 @@ func mandarFul2(f2 *pb.RelojesYRegistros) bool{
 }
 
 func PreguntarFul3() *pb.RelojesYRegistros {
-	direccion := "localhost:50065"
+	direccion := "10.6.40.196:50065"
 
 	conn, err := grpc.Dial(direccion, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
@@ -310,7 +310,7 @@ func PreguntarFul3() *pb.RelojesYRegistros {
 }
 
 func mandarFul3(f3 *pb.RelojesYRegistros) bool{
-	direccion := "localhost:50065"
+	direccion := "10.6.40.196:50065"
 
 	conn, err := grpc.Dial(direccion, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
@@ -468,7 +468,6 @@ func (s *FulcrumServer) ConsistenciaEventual(ctx context.Context, in *pb.SolMerg
 	fulcrum1 := &pb.RelojesYRegistros{ListaVectores: &pb.VectoresList{}, LogRegistros: &pb.RegistroList{}}
 
 	for _, vect := range s.vectores_list.Vectores {
-		log.Println(vect.Planeta)
 		fulcrum1.ListaVectores.Vectores = append(fulcrum1.ListaVectores.Vectores, vect)//agregamos el vector a los vectores
 		registro := leerArchivo(path_registro_planetario + vect.Planeta + ".txt")
 		fulcrum1.LogRegistros.Registr = append(fulcrum1.LogRegistros.Registr, &pb.RegistroUnitario{Array: registro})//agregamos el registro al vector de registros

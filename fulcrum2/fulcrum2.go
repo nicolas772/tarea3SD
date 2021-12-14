@@ -42,7 +42,7 @@ func (server *FulcrumServer) Run(port string) error {
 
 	s := grpc.NewServer()
 	pb.RegisterStarWars1Server(s, server)
-	log.Printf("server listening at %v", lis.Addr())
+	fmt.Println("server listening at ", lis.Addr())
 	return s.Serve(lis)
 }
 
@@ -171,10 +171,11 @@ func BuscarRelojVector(planeta string, s *FulcrumServer) []int32 {
 }
 
 func (s *FulcrumServer) CityMgmtFulcrum(ctx context.Context, in *pb.NewCity1) (*pb.RespFulcrum1, error) {
-	log.Printf("Received from %v: %v", in.GetSender(), in.GetNombrePlaneta())
-	log.Printf("Received from %v: %v", in.GetSender(), in.GetNombreCiudad())
-	log.Printf("Received from %v: %v", in.GetSender(), in.GetNuevoValor())
-	log.Printf("Received from %v: %v", in.GetSender(), in.GetAction())
+	fmt.Println("")
+	fmt.Println("Received from", in.GetSender(), ":" , in.GetNombrePlaneta())
+	fmt.Println("Received from", in.GetSender(), ":" ,in.GetNombreCiudad())
+	fmt.Println("Received from", in.GetSender(), ":" , in.GetNuevoValor())
+	fmt.Println("Received from", in.GetSender(), ":" , in.GetAction())
 	accion := in.GetAction()
 	planeta := in.GetNombrePlaneta()
 	ciudad := in.GetNombreCiudad()
@@ -236,9 +237,9 @@ func (s *FulcrumServer) CityMgmtFulcrum(ctx context.Context, in *pb.NewCity1) (*
 }
 
 func (s *FulcrumServer) CityBrokerFulcrum(ctx context.Context, in *pb.NewCity1) (*pb.RespFulcrum2, error) {
-	log.Printf("Received from Broker: %v", in.GetNombrePlaneta())
-	log.Printf("Received from Broker: %v", in.GetNombreCiudad())
-	log.Printf("Received from Broker: %v", in.GetAction())
+	fmt.Println("Received from Broker:", in.GetNombrePlaneta())
+	fmt.Println("Received from Broker:", in.GetNombreCiudad())
+	fmt.Println("Received from Broker:", in.GetAction())
 	planeta := in.GetNombrePlaneta()
 	ciudad := in.GetNombreCiudad()
 	cant_rebeldes := BuscarCantidadRebeldes(planeta, ciudad)
@@ -247,7 +248,7 @@ func (s *FulcrumServer) CityBrokerFulcrum(ctx context.Context, in *pb.NewCity1) 
 }
 
 func (s *FulcrumServer) RelojesBrokerFulcrum(ctx context.Context, in *pb.Planeta) (*pb.RespFulcrum1, error) {
-	log.Printf("Received from Broker: %v", in.GetNombrePlaneta())
+	fmt.Println("Received from Broker:", in.GetNombrePlaneta())
 	planeta_consultado := in.GetNombrePlaneta()
 	reloj_vector := BuscarRelojVector(planeta_consultado, s)
 	return &pb.RespFulcrum1{RelojVector: reloj_vector, Planeta: planeta_consultado}, nil

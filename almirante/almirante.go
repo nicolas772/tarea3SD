@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	address = "localhost:50051"
+	address = "10.6.40.193:50051"
 )
 
 func NewAlmiranteServer() *AlmiranteServer {

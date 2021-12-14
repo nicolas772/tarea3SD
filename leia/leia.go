@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	address = "localhost:50050"
+	address = "10.6.40.193:50050"
 )
 
 func NewLeiaServer() *LeiaServer {
@@ -69,6 +69,7 @@ func main() {
 	var leia_server *LeiaServer = NewLeiaServer()
 	fmt.Println("Bienvenida Princesa Leia")
 	for no_quit {
+		fmt.Println("")
 		fmt.Println("Por favor, ingrese el comando. Para salir, presione 'Q'")
 		reader := bufio.NewReader(os.Stdin)
 		entrada, _ := reader.ReadString('\n')         // Leer hasta el separador de salto de línea
@@ -97,8 +98,6 @@ func main() {
 				fmt.Println("reloj vector:", reloj)
 				fmt.Println("servidor contactado:", servidor_consultado)
 				ActualizarListaCiudades(ciudad, planeta, servidor_consultado, leia_server, reloj)
-				fmt.Println("Lista Ciudades:", leia_server.ciudades_solic_list)
-
 			} else {
 				fmt.Println("Comando Invalido")
 			}
