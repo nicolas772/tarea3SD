@@ -332,6 +332,7 @@ func planetasEnServidores(f1 *pb.RelojesYRegistros, f2 *pb.RelojesYRegistros, f3
 	estaPlaneta := false
 	//Fulcrum1
 	for _, planeta := range f1.ListaVectores.Vectores {
+		fmt.Println("f1->Planeta: ", planeta.Planeta)
 		for _, planeta2 := range lista_planetas {
 			if planeta2 == planeta.Planeta {
 				estaPlaneta = true
@@ -343,6 +344,7 @@ func planetasEnServidores(f1 *pb.RelojesYRegistros, f2 *pb.RelojesYRegistros, f3
 	}
 	//Fulcrum2
 	for _, planeta := range f2.ListaVectores.Vectores {
+		fmt.Println("f1->Planeta: ", planeta.Planeta)
 		for _, planeta2 := range lista_planetas {
 			if planeta2 == planeta.Planeta {
 				estaPlaneta = true
@@ -354,6 +356,7 @@ func planetasEnServidores(f1 *pb.RelojesYRegistros, f2 *pb.RelojesYRegistros, f3
 	}
 	//Fulcrum3
 	for _, planeta := range f3.ListaVectores.Vectores {
+		fmt.Println("f1->Planeta: ", planeta.Planeta)
 		for _, planeta2 := range lista_planetas {
 			if planeta2 == planeta.Planeta {
 				estaPlaneta = true
