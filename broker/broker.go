@@ -15,7 +15,7 @@ import (
 
 const (
 	port_almirante = ":50051"
-	port_leia      = ":50050"
+	port_leia      = ":50073"
 	port_ahsoka    = ":50054"
 )
 
