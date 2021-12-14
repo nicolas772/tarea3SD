@@ -17,11 +17,8 @@ Fecha de entrega: Martes 14 Noviembre 2021
 
 
 # Instrucciones
+## Ejecución de programas:
 - Se ingresa a las 4 máquinas. Se ingresa a la máquina dist53, dist54, dist55 y dist 56. En cada ventana se ejecuta lo siguiente:
-- [alumno@dist53 ~]$ make createDir
-- [alumno@dist54 ~]$ make createDir
-- [alumno@dist55 ~]$ make createDir
-- [alumno@dist56 ~]$ make createDir
 - [alumno@dist53 ~]$ make run_broker
 - [alumno@dist54 ~]$ make run_fulcrum1
 - [alumno@dist55 ~]$ make run_fulcrum2
@@ -30,6 +27,15 @@ Fecha de entrega: Martes 14 Noviembre 2021
 - [alumno@dist54 ~]$ make run_leia
 - [alumno@dist55 ~]$ make run_almirante
 - [alumno@dist56 ~]$ make run_ahsoka
+## Permite ver los registos planetarios. Por ejemplo: Saturno.txt 
+- [alumno@dist54 ~]$ make registros
+- [alumno@dist55 ~]$ make registros
+- [alumno@dist56 ~]$ make registros
+## Permite ver los registos planetarios. Por ejemplo: Saturno.txt
+- [alumno@dist54 ~]$ make logs
+- [alumno@dist55 ~]$ make logs
+- [alumno@dist56 ~]$ make logs
+
 
 # Decisiones de diseño
 1. Cuando se retorna cantidad de rebeldes igual a "-1" significa que nunca se creo el registro para esa ciudad o fue eliminado/cambio de nombre por algún informante.
