@@ -54,6 +54,10 @@ El criterio utilizado para resolver problemas entre planetas fue el siguiente:
 
 - Si en dos servidores hay contenidos distintos para un mismo planeta, el servidor fulcrum maestro resuelve quedarse con el archivo del servidor fulcrum que más cambios realizó al registro planetario.
 
+# Estructuras de almacenamiento
+1. Para los informantes, los registros modificados junto con sus relojes vector se guardan en memoria, en un array llamado "registros_modificados_list", dentro del struct que define el servidor del informante en particular (AhsokaServer o AlmiranteServer segun corresponda).
+2. Para Leia, las ciudades solicitadas junto con el último servidor solicitado y su reloj vector se almacenan en memoria, en un array llamado "ciudades_solic_list", dentro del struct que define el servidor de Leia (en este caso, LeiaServer).
+3. Para los servidores fulcrum, los relojes vector se almacenan en memoria, en un array llamado "vectores_list", dentro del struct que define al servidor fulcrum (en este caso, FulcrumServer).
 
 
 
