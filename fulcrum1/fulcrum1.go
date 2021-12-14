@@ -68,7 +68,6 @@ func crearArchivo(path string) {
 		}
 		defer file.Close()
 	}
-	//fmt.Println("File Created Successfully", path)
 }
 func escribeArchivo(texto string, path string) {
 	// Abre archivo usando permisos READ & WRITE
@@ -92,7 +91,6 @@ func escribeArchivo(texto string, path string) {
 	if existeError(err) {
 		return
 	}
-	//fmt.Println("Archivo actualizado existosamente.")
 }
 
 func existeError(err error) bool {
@@ -332,7 +330,6 @@ func planetasEnServidores(f1 *pb.RelojesYRegistros, f2 *pb.RelojesYRegistros, f3
 	estaPlaneta := false
 	//Fulcrum1
 	for _, planeta := range f1.ListaVectores.Vectores {
-		fmt.Println("f1->Planeta: ", planeta.Planeta)
 		for _, planeta2 := range lista_planetas {
 			if planeta2 == planeta.Planeta {
 				estaPlaneta = true
@@ -345,7 +342,6 @@ func planetasEnServidores(f1 *pb.RelojesYRegistros, f2 *pb.RelojesYRegistros, f3
 	estaPlaneta = false
 	//Fulcrum2
 	for _, planeta := range f2.ListaVectores.Vectores {
-		fmt.Println("f2->Planeta: ", planeta.Planeta)
 		for _, planeta2 := range lista_planetas {
 			if planeta2 == planeta.Planeta {
 				estaPlaneta = true
@@ -358,7 +354,6 @@ func planetasEnServidores(f1 *pb.RelojesYRegistros, f2 *pb.RelojesYRegistros, f3
 	estaPlaneta = false
 	//Fulcrum3
 	for _, planeta := range f3.ListaVectores.Vectores {
-		fmt.Println("f3->Planeta: ", planeta.Planeta)
 		for _, planeta2 := range lista_planetas {
 			if planeta2 == planeta.Planeta {
 				estaPlaneta = true
@@ -484,7 +479,6 @@ func (s *FulcrumServer) ConsistenciaEventual(ctx context.Context, in *pb.SolMerg
 	//Comenzar consistencia eventual
 	//Misma cantidad de planetas en los servidores (se agregan servidores)
 	arrayPlanetas := planetasEnServidores(fulcrum1, fulcrum2, fulcrum3)
-	fmt.Println("Array de planetas: ", arrayPlanetas)
 	//misma informacion en los servidores
 	agregarPlanetasYConsistencia(arrayPlanetas, fulcrum1, fulcrum2, fulcrum3)
 
