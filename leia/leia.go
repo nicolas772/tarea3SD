@@ -55,19 +55,15 @@ func BuscarRelojVectorYServidor(planeta string, s *LeiaServer) ([]int32, string)
 }
 
 func main() {
-	fmt.Println("---AQUI- Inicio----")
 	address := "10.6.40.193:50073"
 	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
 	defer conn.Close()
-	fmt.Println("---AQUI--1-")
 	c := pb.NewStarWarsClient(conn)
-	fmt.Println("---AQUI--2--")
 	no_quit := true
 	var leia_server *LeiaServer = NewLeiaServer()
-	fmt.Println("---AQUI--3-")
 	fmt.Println("Bienvenida Princesa Leia")
 	for no_quit {
 		fmt.Println("")
