@@ -81,7 +81,7 @@ func main() {
 				planeta := split[1]
 				ciudad := split[2]
 				action := split[0]
-				ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+				ctx, cancel := context.WithTimeout(context.Background(), time.Second*100)
 				defer cancel()
 				ultimo_vector, ultimo_servidor := BuscarRelojVectorYServidor(planeta, leia_server)
 				r, err := c.CityLeiaBroker(ctx, &pb.NewCity{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action, Sender: "leia", RelojVector: ultimo_vector, UltimoServidor: &ultimo_servidor})
