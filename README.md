@@ -34,7 +34,8 @@ Se ingresa a la máquina dist54, dist55 y dist56 en 3 ventanas diferentes y se e
 # Decisiones de diseño
 1. Cuando se retorna cantidad de rebeldes igual a "-1" significa que nunca se creo el registro para esa ciudad o fue eliminado/cambio de nombre por algún informante.
 
-2. Al hacer un merge, este toma al servidor que posee más cambios y replica la información de ese servidor al resto de servidores. 
+2. Al hacer un merge, este toma al servidor que posee más cambios y replica la información de ese servidor al resto de servidores (para un
+planeta en particular). 
 
 
 
