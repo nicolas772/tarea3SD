@@ -1,5 +1,5 @@
 ﻿# Laboratorio 3:
-##Información grupo
+## Información grupo
 Grupo: 14
 Fecha de entrega: Martes 14 Noviembre 2021
 ## Integrantes:
