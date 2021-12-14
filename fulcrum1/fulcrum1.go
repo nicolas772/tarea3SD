@@ -338,6 +338,7 @@ func planetasEnServidores(f1 *pb.RelojesYRegistros, f2 *pb.RelojesYRegistros, f3
 		if !estaPlaneta {
 			lista_planetas = append(lista_planetas, planeta.Planeta)
 		}
+		estaPlaneta = false
 	}
 	estaPlaneta = false
 	//Fulcrum2
@@ -350,6 +351,7 @@ func planetasEnServidores(f1 *pb.RelojesYRegistros, f2 *pb.RelojesYRegistros, f3
 		if !estaPlaneta {
 			lista_planetas = append(lista_planetas, planeta.Planeta)
 		}
+		estaPlaneta = false
 	}
 	estaPlaneta = false
 	//Fulcrum3
@@ -362,6 +364,7 @@ func planetasEnServidores(f1 *pb.RelojesYRegistros, f2 *pb.RelojesYRegistros, f3
 		if !estaPlaneta {
 			lista_planetas = append(lista_planetas, planeta.Planeta)
 		}
+		estaPlaneta = false
 	}
 	return lista_planetas
 }
@@ -480,6 +483,7 @@ func (s *FulcrumServer) ConsistenciaEventual(ctx context.Context, in *pb.SolMerg
 	//Misma cantidad de planetas en los servidores (se agregan servidores)
 	arrayPlanetas := planetasEnServidores(fulcrum1, fulcrum2, fulcrum3)
 	//misma informacion en los servidores
+	fmt.Println(arrayPlanetas)
 	agregarPlanetasYConsistencia(arrayPlanetas, fulcrum1, fulcrum2, fulcrum3)
 
 	//Se actualiza fulcrum 1
