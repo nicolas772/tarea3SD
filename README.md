@@ -27,11 +27,13 @@ Fecha de entrega: Martes 14 Noviembre 2021
 - [alumno@dist54 ~]$ make run_leia
 - [alumno@dist55 ~]$ make run_almirante
 - [alumno@dist56 ~]$ make run_ahsoka
-## Permite ver los registos planetarios. Por ejemplo: Saturno.txt 
+## Permite ver la carpeta de  registrosplanetarios, que contiene los registos de los planetas, por ejemplo, Saturno.txt. 
+## (Cada registro.txt  contiene lineas de la forma nombre_planeta nombre_ciudad cantidad_rebeldes)
 - [alumno@dist54 ~]$ make registros
 - [alumno@dist55 ~]$ make registros
 - [alumno@dist56 ~]$ make registros
-## Permite ver los registos planetarios. Por ejemplo: Saturno.txt
+## Permite ver la carpeta de logsRegistro, que permite ver la carpeta de registros, por ejemplo, Saturno.txt. 
+## (Cada registro.txt  contiene lineas de las acciones realizadas en cada fulcrum considerando UpdateNumber, AddCity, UpdateName y DeleteCity)
 - [alumno@dist54 ~]$ make logs
 - [alumno@dist55 ~]$ make logs
 - [alumno@dist56 ~]$ make logs
