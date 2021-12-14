@@ -43,10 +43,18 @@ Fecha de entrega: Martes 14 Noviembre 2021
 
 
 # Decisiones de diseño
-1. Cuando se retorna cantidad de rebeldes igual a "-1" significa que nunca se creo el registro para esa ciudad o fue eliminado/cambio de nombre por algún informante.
+1. Cuando se le retorna a leia una cantidad de rebeldes igual a "-1", significa que nunca se creó el registro para esa ciudad o fué eliminado/cambió de nombre por algún informante.
 
-2. Al hacer un merge, este toma al servidor que posee más cambios y replica la información de ese servidor al resto de servidores (para un
-planeta en particular). 
+2. En cuanto al merge, hay dos formas en las cuales se producen:
+
+- Evento cada dos minutos, en la que el broker envia un mensaje al fulcrum maestro (en nuestro caso, fulcrum 1), y este gestiona todo el merge.
+- Cuando un informante o leia envia una instrucción, el broker se encarga de comparar los relojes de todos los servidores para el planeta en particular. Si el broker se da cuenta que hay inconsistencias (o cambios concurrentes), este envia un mensaje disparando el "merge de emergencia". Luego de realizar el merge de emergencia, se resuelve automaticamente la petición original del informante o de leia.
+
+El criterio utilizado para resolver problemas entre planetas fue el siguiente:
+
+- Si en dos servidores hay contenidos distintos para un mismo planeta, el servidor fulcrum maestro resuelve quedarse con el archivo del servidor fulcrum que más cambios realizó al registro planetario.
+
+
 
 
 
