@@ -55,6 +55,7 @@ func BuscarRelojVectorYServidor(planeta string, s *LeiaServer) ([]int32, string)
 }
 
 func main() {
+	fmt.Println("---AQUI- Inicio----")
 	address := "10.6.40.193:50050"
 	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
