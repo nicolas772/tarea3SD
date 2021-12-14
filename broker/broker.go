@@ -32,7 +32,7 @@ func PreguntarRelojFul1(planeta string) []int32 {
 	}
 	defer conn.Close()
 	c := pb1.NewStarWars1Client(conn)
-	ctx1, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx1, cancel := context.WithTimeout(context.Background(), time.Second*100)
 	defer cancel()
 	r, err := c.RelojesBrokerFulcrum(ctx1, &pb1.Planeta{NombrePlaneta: planeta})
 	if err != nil {
@@ -50,7 +50,7 @@ func PreguntarRelojFul2(planeta string) []int32 {
 	}
 	defer conn.Close()
 	c := pb1.NewStarWars1Client(conn)
-	ctx1, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx1, cancel := context.WithTimeout(context.Background(), time.Second*100)
 	defer cancel()
 	r, err := c.RelojesBrokerFulcrum(ctx1, &pb1.Planeta{NombrePlaneta: planeta})
 	if err != nil {
@@ -68,7 +68,7 @@ func PreguntarRelojFul3(planeta string) []int32 {
 	}
 	defer conn.Close()
 	c := pb1.NewStarWars1Client(conn)
-	ctx1, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx1, cancel := context.WithTimeout(context.Background(), time.Second*100)
 	defer cancel()
 	r, err := c.RelojesBrokerFulcrum(ctx1, &pb1.Planeta{NombrePlaneta: planeta})
 	if err != nil {
@@ -247,7 +247,7 @@ func merge()bool{
 	defer conn3.Close()
 	//conección con Falcrum1
 	c1 := pb1.NewStarWars1Client(conn3)
-	ctx2, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx2, cancel := context.WithTimeout(context.Background(), time.Second*100)
 	defer cancel()
 	r, err := c1.ConsistenciaEventual(ctx2, &pb1.SolMerge{HacerMerge: true})
 	fmt.Println("------FIN MERGE------")
@@ -329,7 +329,7 @@ func (s *BrokerServer) CityLeiaBroker(ctx context.Context, in *pb.NewCity) (*pb.
 	}
 	defer conn.Close()
 	c := pb1.NewStarWars1Client(conn)
-	ctx1, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx1, cancel := context.WithTimeout(context.Background(), time.Second*100)
 	defer cancel()
 	r, err := c.CityBrokerFulcrum(ctx1, &pb1.NewCity1{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action})
 	if err != nil {

@@ -264,7 +264,7 @@ func PreguntarFul2() *pb.RelojesYRegistros {
 	}
 	defer conn.Close()
 	c := pb.NewStarWars1Client(conn)
-	ctx1, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx1, cancel := context.WithTimeout(context.Background(), time.Second*100)
 	defer cancel()
 	r, err := c.PreguntarRelojesYRegistros(ctx1, &pb.SolMerge{HacerMerge: true})
 	if err != nil {
@@ -282,7 +282,7 @@ func mandarFul2(f2 *pb.RelojesYRegistros) bool{
 	}
 	defer conn.Close()
 	c := pb.NewStarWars1Client(conn)
-	ctx1, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx1, cancel := context.WithTimeout(context.Background(), time.Second*100)
 	defer cancel()
 	r, err := c.MandarFulcrums(ctx1, f2)
 	if err != nil {
@@ -300,7 +300,7 @@ func PreguntarFul3() *pb.RelojesYRegistros {
 	}
 	defer conn.Close()
 	c := pb.NewStarWars1Client(conn)
-	ctx1, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx1, cancel := context.WithTimeout(context.Background(), time.Second*100)
 	defer cancel()
 	r, err := c.PreguntarRelojesYRegistros(ctx1, &pb.SolMerge{HacerMerge: true})
 	if err != nil {
@@ -318,7 +318,7 @@ func mandarFul3(f3 *pb.RelojesYRegistros) bool{
 	}
 	defer conn.Close()
 	c := pb.NewStarWars1Client(conn)
-	ctx1, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx1, cancel := context.WithTimeout(context.Background(), time.Second*100)
 	defer cancel()
 	r, err := c.MandarFulcrums(ctx1, f3)
 	if err != nil {

@@ -87,7 +87,7 @@ func main() {
 					cant_soldados = split[3]
 				}
 
-				ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+				ctx, cancel := context.WithTimeout(context.Background(), time.Second*100)
 				defer cancel()
 				vector_reloj, ultimo_servidor := BuscarRelojVectorYServidor(planeta, almirante_server)
 				r, err := c.CityMgmtBroker(ctx, &pb.NewCity{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action, NuevoValor: &cant_soldados, Sender: "almirante", RelojVector: vector_reloj, UltimoServidor: &ultimo_servidor})
@@ -103,7 +103,7 @@ func main() {
 				}
 				//defer conn1.Close()
 				c1 := pb1.NewStarWars1Client(conn1)
-				ctx1, cancel := context.WithTimeout(context.Background(), time.Second)
+				ctx1, cancel := context.WithTimeout(context.Background(), time.Second*100)
 				defer cancel()
 
 				r1, errr := c1.CityMgmtFulcrum(ctx1, &pb1.NewCity1{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action, NuevoValor: &cant_soldados, Sender: "almirante"})
@@ -126,7 +126,7 @@ func main() {
 				ciudad := split[2]
 				action := split[0]
 				cant_soldados := split[3]
-				ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+				ctx, cancel := context.WithTimeout(context.Background(), time.Second*100)
 				defer cancel()
 				vector_reloj, ultimo_servidor := BuscarRelojVectorYServidor(planeta, almirante_server)
 				r, err := c.CityMgmtBroker(ctx, &pb.NewCity{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action, NuevoValor: &cant_soldados, Sender: "almirante", RelojVector: vector_reloj, UltimoServidor: &ultimo_servidor})
@@ -141,7 +141,7 @@ func main() {
 				}
 				//defer conn1.Close()
 				c1 := pb1.NewStarWars1Client(conn1)
-				ctx1, cancel := context.WithTimeout(context.Background(), time.Second)
+				ctx1, cancel := context.WithTimeout(context.Background(), time.Second*100)
 				defer cancel()
 				r1, errr := c1.CityMgmtFulcrum(ctx1, &pb1.NewCity1{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action, NuevoValor: &cant_soldados, Sender: "almirante"})
 				if errr != nil {
@@ -162,7 +162,7 @@ func main() {
 				planeta := split[1]
 				ciudad := split[2]
 				action := split[0]
-				ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+				ctx, cancel := context.WithTimeout(context.Background(), time.Second*100)
 				defer cancel()
 				vector_reloj, ultimo_servidor := BuscarRelojVectorYServidor(planeta, almirante_server)
 				r, err := c.CityMgmtBroker(ctx, &pb.NewCity{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action, Sender: "almirante", RelojVector: vector_reloj, UltimoServidor: &ultimo_servidor})
@@ -177,7 +177,7 @@ func main() {
 				}
 				//defer conn1.Close()
 				c1 := pb1.NewStarWars1Client(conn1)
-				ctx1, cancel := context.WithTimeout(context.Background(), time.Second)
+				ctx1, cancel := context.WithTimeout(context.Background(), time.Second*100)
 				defer cancel()
 				r1, errr := c1.CityMgmtFulcrum(ctx1, &pb1.NewCity1{NombrePlaneta: planeta, NombreCiudad: ciudad, Action: action, Sender: "almirante"})
 				if errr != nil {
