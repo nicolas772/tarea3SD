@@ -483,7 +483,6 @@ func (s *FulcrumServer) ConsistenciaEventual(ctx context.Context, in *pb.SolMerg
 	//Misma cantidad de planetas en los servidores (se agregan servidores)
 	arrayPlanetas := planetasEnServidores(fulcrum1, fulcrum2, fulcrum3)
 	//misma informacion en los servidores
-	fmt.Println(arrayPlanetas)
 	agregarPlanetasYConsistencia(arrayPlanetas, fulcrum1, fulcrum2, fulcrum3)
 
 	//Se actualiza fulcrum 1
