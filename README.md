@@ -18,11 +18,11 @@ Fecha de entrega: Martes 14 Noviembre 2021
 
 # Instrucciones
 ## Ejecución de programas:
-- Se ingresa a las 4 máquinas. Se ingresa a la máquina dist53, dist54, dist55 y dist 56. En cada ventana se ejecuta lo siguiente:
-- [alumno@dist53 ~]$ make run_broker
+- Se ingresa a las 4 máquinas. Se ingresa a la máquina dist54, dist55, dist56 y dist5. En cada ventana se ejecutan los siguientes comandos siguiendo el orden:
 - [alumno@dist54 ~]$ make run_fulcrum1
 - [alumno@dist55 ~]$ make run_fulcrum2
 - [alumno@dist56 ~]$ make run_fulcrum3
+- [alumno@dist53 ~]$ make run_broker
 - Se ingresa a la máquina dist54, dist55 y dist56 en 3 ventanas diferentes y se ejecuta:
 - [alumno@dist54 ~]$ make run_leia
 - [alumno@dist55 ~]$ make run_almirante
